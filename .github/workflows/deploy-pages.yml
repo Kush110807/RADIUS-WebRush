@@ -19,6 +19,11 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: npm run validate:data
+      - run: npm run verify:data
+      - run: npm run preflight
+      - run: npm run lint
+      - run: npm run typecheck
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v3
         with:

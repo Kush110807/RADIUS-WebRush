@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-DATA = Path(__file__).resolve().parents[1] / "src" / "data" / "anonymous37.json"
+DATA = Path(__file__).resolve().parents[1] / "public" / "data" / "anonymous37.json"
 payload = json.loads(DATA.read_text(encoding="utf-8"))
 records = payload["records"]
 

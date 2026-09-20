@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "src" / "data" / "anonymous37.json"
+DATA = ROOT / "public" / "data" / "anonymous37.json"
 RAW_UID = "c37f9221f44e9ca35a49180dc05a7587"
 
 with DATA.open(encoding="utf-8") as f:

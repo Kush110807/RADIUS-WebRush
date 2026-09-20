@@ -1,9 +1,9 @@
 import { motion } from 'motion/react'
-import { ExternalLink, ScanSearch } from 'lucide-react'
+import { ChevronRight, ScanSearch } from 'lucide-react'
 import type { DataPayload, LifeReceipt, ThreadId } from '../types/receipts'
 import { chapters } from '../data/chapters'
 import { fmtDate } from '../lib/formatters'
-import { metricSpecs } from '../lib/metrics'
+import { metricSpecs, threads } from '../lib/metrics'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import ReceiptCard from './ReceiptCard'
 
@@ -36,6 +36,40 @@ function chapterComparison(receipt: LifeReceipt, data: DataPayload) {
   return `Compared with Before, the median day returns to ${here.placesVisited?.toFixed(0)} places, reaches ${here.distanceKm?.toFixed(2)} km of travel, and records about ${here.movementMinutes?.toFixed(0)} minutes on foot.`
 }
 
+function dailyPattern(receipt: LifeReceipt, thread: ThreadId, baseline: Record<string, number | null>) {
+  const comparisons = metricSpecs[thread].flatMap((spec) => {
+    const raw = receipt[spec.key]
+    const value = typeof raw === 'number' ? raw : null
+    const reference = baseline[String(spec.key)] ?? null
+    if (value == null || reference == null || reference === 0) return []
+    const delta = ((value - reference) / Math.abs(reference)) * 100
+    return [{ label: spec.label, delta }]
+  })
+
+  if (!comparisons.length) {
+    return `This day does not contain enough comparable ${threads.find((item) => item.id === thread)?.label.toLowerCase()} evidence for a daily pattern link.`
+  }
+
+  if (thread === 'movement') {
+    const home = comparisons.find((item) => item.label === 'Time at home')
+    const outward = comparisons.filter((item) => ['Distance travelled', 'Places visited', 'Detected movement on foot'].includes(item.label))
+    if (home && home.delta > 10 && outward.length >= 2 && outward.every((item) => item.delta < -10)) {
+      return 'Connected receipts: outward movement is below the Before median while time at home moves in the opposite direction.'
+    }
+  }
+
+  const below = comparisons.filter((item) => item.delta < -10).length
+  const above = comparisons.filter((item) => item.delta > 10).length
+  const near = comparisons.length - below - above
+  const parts = [
+    below ? `${below} below` : '',
+    above ? `${above} above` : '',
+    near ? `${near} near` : '',
+  ].filter(Boolean)
+
+  return `Connected receipts: ${parts.join(', ')} the Before median across ${comparisons.length} comparable ${thread} signal${comparisons.length === 1 ? '' : 's'} recorded today.`
+}
+
 export default function CurrentObservation({
   receipt,
   thread,
@@ -50,6 +84,7 @@ export default function CurrentObservation({
   const chapter = chapters.find((item) => item.id === receipt.chapter)!
   const count = Math.min(3, metricSpecs[thread].length)
   const reduce = useReducedMotion()
+  const pattern = dailyPattern(receipt, thread, data.chapterMedians.before)
 
   return (
     <aside className="observation" aria-label="Current observation">
@@ -63,6 +98,10 @@ export default function CurrentObservation({
         <h2>{chapter.status}</h2>
         <p className="observation-copy">{chapter.observation}</p>
         <p className="chapter-compare">{chapterComparison(receipt, data)}</p>
+        <div className="pattern-link">
+          <span>Signal connection</span>
+          <p>{pattern}</p>
+        </div>
         <p className="qualification">{chapter.interpretation}</p>
       </motion.div>
 
@@ -85,10 +124,10 @@ export default function CurrentObservation({
         ))}
       </div>
 
-      <button className="evidence-button" onClick={onEvidence}>
+      <button className="evidence-button" type="button" onClick={onEvidence}>
         <ScanSearch size={18} aria-hidden="true" />
         Show the evidence
-        <ExternalLink size={14} aria-hidden="true" />
+        <ChevronRight size={15} aria-hidden="true" />
       </button>
     </aside>
   )

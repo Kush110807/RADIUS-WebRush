@@ -6,13 +6,13 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "src" / "data" / "anonymous37.json"
+DATA = ROOT / "public" / "data" / "anonymous37.json"
 INTERNAL_UID = "c37f9221f44e9ca35a49180dc05a7587"
 
 payload = json.loads(DATA.read_text(encoding="utf-8"))
 records = payload["records"]
 
-required_components = {
+required_shared_components = {
     "LivingRadius.tsx",
     "ChapterNavigator.tsx",
     "TimeScrubber.tsx",
@@ -20,11 +20,11 @@ required_components = {
     "ReceiptCard.tsx",
     "CurrentObservation.tsx",
     "EvidenceDrawer.tsx",
-    "ArchiveExplorer.tsx",
-    "Methodology.tsx",
 }
 actual_components = {path.name for path in (ROOT / "src" / "components").glob("*.tsx")}
-assert required_components <= actual_components, required_components - actual_components
+assert required_shared_components <= actual_components, required_shared_components - actual_components
+assert (ROOT / "src" / "features" / "archive" / "ArchiveExplorer.tsx").exists()
+assert (ROOT / "src" / "features" / "methodology" / "Methodology.tsx").exists()
 
 assert payload["participant"] == "Anonymous 37"
 assert len(records) == 1227
@@ -59,6 +59,27 @@ def chapter(date: str) -> str:
 
 assert all(record["chapter"] == chapter(record["date"]) for record in records)
 
+
+# Feature architecture and responsive hardening must remain present.
+required_architecture = [
+    ROOT / "src" / "app" / "AppShell.tsx",
+    ROOT / "src" / "app" / "useArchiveData.ts",
+    ROOT / "src" / "app" / "useHashView.ts",
+    ROOT / "src" / "features" / "landing" / "LandingView.tsx",
+    ROOT / "src" / "features" / "story" / "StoryView.tsx",
+    ROOT / "src" / "features" / "archive" / "ArchiveView.tsx",
+    ROOT / "src" / "features" / "methodology" / "MethodologyView.tsx",
+    ROOT / "src" / "data" / "archiveRepository.ts",
+    ROOT / "src" / "styles" / "responsive.css",
+]
+assert all(path.exists() for path in required_architecture)
+responsive_css = (ROOT / "src" / "styles" / "responsive.css").read_text(encoding="utf-8")
+for width in (1600, 1180, 900, 768, 560, 375, 320):
+    assert str(width) in responsive_css, f"missing responsive breakpoint {width}"
+assert "100vw -" not in responsive_css
+assert (ROOT / "public" / "data" / "anonymous37.json").exists()
+assert not (ROOT / "src" / "data" / "anonymous37.json").exists(), "archive must stay outside initial JS graph"
+
 # Static-deployment configuration exists and points to the Vite output directory.
 netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
 assert 'command = "npm run build"' in netlify
@@ -66,4 +87,4 @@ assert 'publish = "dist"' in netlify
 assert (ROOT / ".github" / "workflows" / "deploy-pages.yml").exists()
 
 print("RADIUS repository preflight: PASS")
-print(f"{len(records)} records · {len(actual_components)} components · privacy checks passed")
+print(f"{len(records)} records · {len(actual_components)} shared components · feature ownership checks passed · privacy checks passed")

@@ -2,7 +2,7 @@
 """Create the compact, privacy-preserving Anonymous 37 dataset used by RADIUS.
 
 Usage:
-  python scripts/prepare_data.py /path/to/archive.zip src/data/anonymous37.json
+  python scripts/prepare_data.py /path/to/archive.zip public/data/anonymous37.json
 
 This is an offline build-time transformation. The web app never reads the source archive.
 """

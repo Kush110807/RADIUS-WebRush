@@ -1,0 +1,190 @@
+/*
+ * Responsive hardening layer.
+ * The experience reflows at content-driven breakpoints instead of relying on horizontal page overflow.
+ * Target verification widths: 320, 375, 768, 1280, 1440 and 1920px.
+ */
+:root {
+  --page-gutter: clamp(14px, 3vw, 46px);
+  --content-max: 1680px;
+}
+
+html, body, #root, .app-shell { width:100%; max-width:100%; }
+main, section, nav, header, footer, div { min-width:0; }
+svg, img { max-width:100%; }
+.hero-copy, .hero-visual, .visual-stage, .observation, .archive-header > *, .archive-card { min-width:0; }
+.hero-support, .observation-copy, .chapter-compare, .qualification, .archive-header p, .methodology-wrap p { overflow-wrap:anywhere; }
+
+/* Large desktop: stop the story from becoming sparse at ultrawide sizes. */
+@media (min-width: 1600px) {
+  .landing, .story-grid, .scrubber, .story-footer { width:min(100%, var(--content-max)); margin-left:auto; margin-right:auto; }
+  .landing { grid-template-columns:minmax(0,1.05fr) minmax(460px,.95fr); column-gap:clamp(56px,5vw,92px); }
+  .story-grid { grid-template-columns:minmax(220px,2.2fr) minmax(560px,6.4fr) minmax(320px,3.1fr); }
+  .radius-figure { width:min(100%,680px); }
+  .hero-radius-field { width:min(31vw,560px); }
+}
+
+/* 1280–1599: full three-column editorial composition. */
+@media (max-width: 1599px) and (min-width: 1181px) {
+  .story-grid { grid-template-columns:minmax(185px,2.1fr) minmax(440px,6.3fr) minmax(275px,3.2fr); }
+  .hero-radius-field { width:min(35vw,500px); }
+}
+
+/* Compact desktop / landscape tablet. */
+@media (max-width: 1180px) and (min-width: 901px) {
+  .story-grid { grid-template-columns:minmax(160px,1.8fr) minmax(390px,5.4fr) minmax(245px,2.8fr); gap:clamp(14px,1.8vw,24px); }
+  .chapter-button { grid-template-columns:32px minmax(0,1fr) 4px; }
+  .radius-figure { width:min(100%,560px); }
+  .archive-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* Tablet portrait: chapter navigation becomes a real grid, then story content stacks. */
+@media (max-width: 900px) {
+  .landing { grid-template-columns:1fr; grid-template-rows:auto auto auto; align-content:start; padding-inline:var(--page-gutter); }
+  .hero-copy { max-width:760px; }
+  .hero-visual { min-height:clamp(340px,52vw,500px); }
+  .hero-radius-field { width:min(64vw,470px); }
+  .landing-footer { grid-row:3; }
+
+  .story-grid { display:grid; grid-template-columns:minmax(0,1fr); padding:20px var(--page-gutter) 8px; }
+  .chapters { width:100%; padding-top:0; overflow:visible; }
+  .chapters > .eyebrow { margin-left:0; }
+  .chapters ol { display:grid; width:100%; min-width:0; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+  .chapters ol:before { display:none; }
+  .chapter-button { min-height:68px; grid-template-columns:30px minmax(0,1fr) 4px; padding:7px 8px; }
+  .chapter-button.active { transform:none; }
+  .chapter-index { width:30px; height:30px; }
+  .chapter-copy > span { display:none; }
+
+  .visual-stage { width:100%; }
+  .visual-heading { margin-top:8px; }
+  .radius-figure { width:min(100%,590px); }
+  .radius-figure svg { max-height:none; }
+  .thread-strip { width:100%; max-width:100%; justify-content:center; }
+
+  .observation { width:100%; padding-top:10px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr); gap:16px; }
+  .observation > div:first-child { grid-column:1; grid-row:1 / span 2; }
+  .receipt-stack { grid-column:2; grid-row:1; }
+  .observation > .evidence-button { grid-column:2; }
+
+  .scrubber, .story-footer { margin-left:var(--page-gutter); margin-right:var(--page-gutter); }
+}
+
+/* 768 and below: eliminate tablet-specific side-by-side pressure. */
+@media (max-width: 768px) {
+  .topbar { padding-inline:max(14px, env(safe-area-inset-left)); }
+  .source-pill { max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .landing { padding-top:clamp(32px,7vw,54px); }
+  .hero-copy h1 { font-size:clamp(3.8rem,14vw,6.4rem); }
+  .hero-tagline { margin-top:24px; }
+  .hero-visual { min-height:360px; }
+  .hero-radius-field { width:min(72vw,430px); }
+
+  .chapters ol { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .chapter-button { min-height:64px; }
+  .chapter-copy small { display:block; }
+
+  .observation { display:flex; flex-direction:column; gap:12px; }
+  .observation > div:first-child, .receipt-stack, .observation > .evidence-button { width:100%; }
+  .receipt.compact { margin-left:0; }
+  .thread-strip { justify-content:flex-start; overflow-x:auto; overscroll-behavior-inline:contain; scroll-snap-type:x proximity; padding-bottom:8px; }
+  .thread-chip { scroll-snap-align:start; }
+
+  .archive-view, .methodology-view { padding-inline:var(--page-gutter); }
+  .archive-header { grid-template-columns:1fr; }
+  .archive-count { justify-self:start; }
+  .archive-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .methodology-wrap section { grid-template-columns:1fr; gap:12px; }
+  .methodology-wrap section > p, .methodology-wrap section > ul, .method-stats { grid-column:1; }
+}
+
+/* Phones: one-column receipts, no page-level horizontal scroll, bottom-sheet evidence. */
+@media (max-width: 560px) {
+  .topbar { height:60px; padding-inline:14px; }
+  .source-pill { display:none; }
+  .top-actions { gap:2px; }
+  .top-actions button { min-width:44px; min-height:44px; padding:0 10px; }
+  .top-actions button span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  .landing { min-height:calc(100svh - 60px); padding:34px 16px 20px; gap:10px; }
+  .hero-copy h1 { font-size:clamp(3.15rem,17vw,4.9rem); line-height:.84; }
+  .hero-support { font-size:.8rem; line-height:1.62; }
+  .primary-cta { width:100%; min-height:50px; justify-content:space-between; }
+  .hero-visual { min-height:330px; }
+  .hero-radius-field { width:min(82vw,350px); }
+  .hero-caption { position:relative; right:auto; bottom:auto; justify-self:end; align-self:end; max-width:220px; margin-top:-24px; }
+  .landing-footer { display:grid; gap:6px; }
+  .landing-footer span:last-child { display:none; }
+
+  .story { min-height:calc(100svh - 60px); }
+  .story-grid { padding:14px 12px 6px; gap:12px; }
+  .chapters { overflow:visible; }
+  .chapters ol { display:grid; width:100%; min-width:0; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+  .chapter-button { min-width:0; min-height:60px; }
+  .chapter-copy strong { font-size:.68rem; }
+  .chapter-copy small { font-size:.57rem; white-space:normal; line-height:1.25; }
+  .visual-heading h1 { font-size:clamp(1.55rem,7vw,2rem); }
+  .visual-heading > span { padding:6px 8px; font-size:.58rem; }
+  .radius-figure { width:min(100%,420px); }
+  .signature-legend { justify-content:flex-start; padding-inline:0; }
+  .thread-strip { margin-top:10px; }
+  .observation h2 { font-size:clamp(1.6rem,8vw,2rem); }
+  .scrubber { margin:8px 12px 0; padding-top:12px; }
+  .range-wrap, .range-wrap input[type="range"] { height:44px; }
+  .story-footer { margin:0 12px; gap:4px; }
+  .story-footer > span { display:none; }
+  .story-footer button { min-height:44px; padding-inline:8px; }
+  .story-footer button:last-child { margin-left:auto; }
+
+  .evidence-drawer { top:auto; left:0; right:0; bottom:0; width:100%; max-width:none; max-height:86svh; border-left:0; border-top:1px solid var(--line-strong); border-radius:18px 18px 0 0; padding:22px 16px max(28px,env(safe-area-inset-bottom)); }
+  .evidence-drawer:before { content:""; display:block; width:38px; height:3px; border-radius:999px; background:rgba(241,237,228,.22); margin:-10px auto 16px; }
+  .drawer-snapshot { grid-template-columns:repeat(3,minmax(0,1fr)); }
+
+  .archive-view, .methodology-view { padding:22px 12px 50px; }
+  .archive-header h1, .methodology-wrap > h1 { font-size:clamp(2.7rem,15vw,4.8rem); }
+  .archive-controls { padding:10px; }
+  .archive-thread-row { overflow-x:auto; overscroll-behavior-inline:contain; }
+  .filter-row { grid-template-columns:1fr 1fr; }
+  .filter-row select { width:100%; min-height:44px; }
+  .archive-grid { grid-template-columns:1fr; gap:8px; }
+  .archive-card { min-height:150px; }
+  .archive-card-body { grid-template-columns:70px minmax(0,1fr); }
+  .method-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+
+/* Narrow phones: simplify secondary metadata rather than forcing compression. */
+@media (max-width: 375px) {
+  .landing { padding-inline:14px; }
+  .hero-copy h1 { font-size:clamp(3rem,16.5vw,4rem); }
+  .hero-radius-field { width:min(86vw,320px); }
+  .visual-heading > span { font-size:.54rem; }
+  .chapter-copy small { display:none; }
+  .receipt-main { align-items:flex-start; flex-direction:column; gap:5px; }
+  .receipt-main b { white-space:normal; }
+  .filter-row { grid-template-columns:1fr; }
+  .drawer-snapshot { grid-template-columns:1fr 1fr; }
+  .method-stats { grid-template-columns:1fr; }
+}
+
+/* Minimum supported viewport: preserve all controls at 320px without page overflow. */
+@media (max-width: 320px) {
+  .topbar { padding-inline:10px; }
+  .wordmark { letter-spacing:.14em; }
+  .landing { padding-inline:10px; }
+  .hero-copy h1 { font-size:2.95rem; }
+  .hero-caption { max-width:190px; }
+  .story-grid { padding-inline:10px; }
+  .chapter-button { padding-inline:6px; }
+  .visual-heading { gap:8px; }
+  .visual-heading > span { display:none; }
+  .scrubber, .story-footer { margin-left:10px; margin-right:10px; }
+  .archive-view, .methodology-view { padding-inline:10px; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button, select, input { min-height:44px; }
+  .chapter-button, .archive-card, .thread-chip { touch-action:manipulation; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-orbit { box-shadow:none; }
+}

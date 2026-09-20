@@ -1,5 +1,6 @@
 import { useMemo, type ChangeEvent } from 'react'
 import type { LifeReceipt } from '../types/receipts'
+import { chapterColors } from '../data/chapters'
 import { fmtDate } from '../lib/formatters'
 
 const DAY_MS = 86_400_000
@@ -15,13 +16,14 @@ export default function TimeScrubber({
   onChange: (next: number) => void
 }) {
   const current = records[index]
-  const pct = (index / (records.length - 1)) * 100
+  const denominator = Math.max(1, records.length - 1)
+  const pct = (index / denominator) * 100
 
-  const { march, density, yearLabels } = useMemo(() => {
+  const { march, density, yearLabels, chapterBands } = useMemo(() => {
     const positionForDate = (target: string) => {
       const found = records.findIndex((record) => record.date >= target)
       const resolved = found < 0 ? records.length - 1 : found
-      return (resolved / (records.length - 1)) * 100
+      return (resolved / Math.max(1, records.length - 1)) * 100
     }
 
     const densityMarks = Array.from({ length: 72 }, (_, i) => {
@@ -35,9 +37,22 @@ export default function TimeScrubber({
       return { left: (i / 71) * 100, coverage }
     })
 
+    const bands = ['before', 'collapse', 'adaptation', 'reopening'].flatMap((chapter) => {
+      const start = records.findIndex((record) => record.chapter === chapter)
+      if (start < 0) return []
+      let end = start
+      while (end + 1 < records.length && records[end + 1].chapter === chapter) end += 1
+      return [{
+        chapter: chapter as LifeReceipt['chapter'],
+        left: (start / Math.max(1, records.length - 1)) * 100,
+        width: Math.max(0.5, ((end - start + 1) / Math.max(1, records.length - 1)) * 100),
+      }]
+    })
+
     return {
       march: positionForDate('2020-03-01'),
       density: densityMarks,
+      chapterBands: bands,
       yearLabels: [
         { label: '2018', left: 0 },
         { label: '2019', left: positionForDate('2019-01-01') },
@@ -71,15 +86,27 @@ export default function TimeScrubber({
           </span>
         </div>
 
+        <div className="chapter-bands" aria-hidden="true">
+          {chapterBands.map((band) => (
+            <i
+              key={band.chapter}
+              style={{ left: `${band.left}%`, width: `${band.width}%`, background: chapterColors[band.chapter] }}
+            />
+          ))}
+        </div>
+
         <input
           aria-label="Life-receipt date"
+          aria-describedby="timeline-help"
           aria-valuetext={`${fmtDate(current.date)}, ${current.chapter} chapter`}
           type="range"
           min="0"
           max={records.length - 1}
+          step="1"
           value={index}
           onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(Number(event.target.value))}
         />
+        <span className="sr-only" id="timeline-help">Use arrow keys for nearby recorded days. Home and End jump to the first and last record.</span>
       </div>
 
       <div className="year-labels" aria-hidden="true">

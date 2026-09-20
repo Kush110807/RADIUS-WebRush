@@ -10,9 +10,11 @@
     "preview": "vite preview",
     "prepare:data": "python scripts/prepare_data.py",
     "validate:data": "python scripts/validate_data.py",
-    "check": "npm run validate:data && npm run preflight && npm run typecheck && npm run build",
+    "check": "npm run validate:data && npm run verify:data && npm run preflight && npm run lint && npm run final:audit && npm run typecheck && npm run build",
     "verify:data": "python scripts/verify_data.py",
-    "preflight": "python scripts/preflight.py"
+    "preflight": "python scripts/preflight.py",
+    "lint": "python scripts/lint.py",
+    "final:audit": "python scripts/final_audit.py"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "5.2.8",
@@ -31,8 +33,21 @@
     "typescript": "5.9.2",
     "vite": "7.1.7"
   },
-  "description": "An interactive editorial archive showing how one anonymous student\u2019s recorded daily radius contracted and expanded across four years.",
+  "description": "An interactive editorial archive showing how one anonymous student’s recorded daily radius contracted and expanded across four years.",
   "engines": {
     "node": ">=22.12"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kush110807/RADIUS-WebRush.git"
+  },
+  "homepage": "https://kush110807.github.io/RADIUS-WebRush/",
+  "keywords": [
+    "data-storytelling",
+    "react",
+    "typescript",
+    "accessibility",
+    "responsive-design",
+    "hackathon"
+  ]
 }

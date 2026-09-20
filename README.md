@@ -8,7 +8,7 @@
 
 The WebRush challenge **“Your Life, In Receipts”** asks for more than a chronological dump of personal data. RADIUS moves through the chain **raw data → insights → connections → story** by linking daily sensing and survey records into an explorable “living radius.” The experience shows what changed in the records while deliberately avoiding claims about private events, diagnoses, or causation.
 
-The deployed application is **frontend-only**. It uses a compact, privacy-preserving static JSON file prepared offline from the source archive. There is no backend, database, authentication layer, server-side processing, or raw 2.76 GB dataset in the deployed project.
+The deployed application is **frontend-only**. It uses a compact, privacy-preserving static JSON file prepared offline from the source archive and fetched as a cacheable public asset so the evidence does not inflate the initial JavaScript bundle. There is no backend, database, authentication layer, server-side processing, or raw 2.76 GB dataset in the deployed project.
 
 ## Core interaction
 
@@ -95,8 +95,8 @@ The preparation step verifies, among other things:
 
 - 1,227 daily sensing rows from 25 Sep 2018 to 15 Jun 2022
 - 1,226 days with at least one location-derived field available
-- 417 non-missing self-reported stress responses in the raw EMA table; 416 align to the deployed sensing-day archive
-- 417 non-missing social-level responses in the raw EMA table; 416 align to the deployed sensing-day archive
+- 417 participant general-EMA response rows in the extracted source; 416 stress values align to the deployed sensing-day archive
+- 417 participant general-EMA response rows for the social field; 416 social-level values align to the deployed sensing-day archive
 - 295 COVID EMA rows, of which 96 contain at least one non-null COVID answer field
 - 68,953 raw background-application observations; 68,728 align to the deployed sensing days
 - 4,884 raw call records
@@ -110,7 +110,7 @@ Raw message contents, contact hashes, coordinates, and unnecessary demographic a
 The original archive is used **only at build/preparation time**. Run:
 
 ```bash
-python scripts/prepare_data.py "/path/to/archive.zip" src/data/anonymous37.json
+python scripts/prepare_data.py "/path/to/archive.zip" public/data/anonymous37.json
 python scripts/verify_data.py
 ```
 
@@ -126,7 +126,7 @@ Raw Sensing/running_apps/<participant>.csv
 Raw Sensing/unlock/<participant>.csv
 ```
 
-It converts raw sensing units into display-ready daily values, aggregates only what the interface needs, calculates chapter medians from the highest-precision source values, computes the living-radius score, and writes `src/data/anonymous37.json` (about 558 KiB).
+It converts raw sensing units into display-ready daily values, aggregates only what the interface needs, calculates chapter medians from the highest-precision source values, computes the living-radius score, and writes `public/data/anonymous37.json` (about 558 KiB). The browser fetches this static file through `archiveRepository.ts`; the source ZIP is never loaded at runtime.
 
 Missing values remain `null`. They are never silently converted to zero.
 
@@ -156,7 +156,8 @@ Missing values remain `null`. They are never silently converted to zero.
 
 - Static daily aggregates instead of the complete raw archive
 - ~558 KiB compact JSON instead of 2.76 GB source data
-- Archive and Methodology views are lazy-loaded
+- The compact JSON is a separate cacheable static asset, so it is not bundled into the initial JavaScript chunk
+- Archive and Methodology feature views are lazy-loaded
 - No raster hero imagery, 3D, WebGL, map tiles, or particle system
 - Custom SVG instead of a charting dependency
 - Derived timeline/trail/search values are memoised where useful
@@ -178,6 +179,11 @@ Open the local URL printed by Vite.
 ## Production build
 
 ```bash
+npm run validate:data
+npm run verify:data
+npm run preflight
+npm run lint
+npm run final:audit
 npm run typecheck
 npm run build
 npm run preview
@@ -211,10 +217,73 @@ A workflow is included at `.github/workflows/deploy-pages.yml`.
 
 The workflow builds with a repository-specific Vite base path and publishes `dist/`.
 
+## Architecture
+
+RADIUS uses a small feature-based frontend architecture rather than placing routing, data loading, story state, and view composition inside one component:
+
+```text
+main.tsx
+  ↓
+App.tsx                    composition + lazy feature boundaries
+  ↓
+app/                       shell, hash navigation, archive loading state
+  ↓
+features/                  landing, story, archive, methodology
+  ↓
+components/                reusable visual and interaction primitives
+  ↓
+data/archiveRepository.ts  static-data access + runtime shape guard + cache
+  ↓
+public/data/anonymous37.json
+```
+
+Story-specific state (timeline index, selected evidence thread, evidence drawer) is owned by `StoryView`. Archive search/filter state remains inside the Archive feature. Shared presentation components do not own application navigation. This keeps data access, feature state, navigation, and rendering responsibilities separate without introducing a state-management framework.
+
+## Responsive design strategy
+
+The interface is designed around content-driven breakpoints rather than device names. The final CSS explicitly covers the evaluation widths and reflows rather than shrinking the desktop layout:
+
+| Width | Behaviour |
+| --- | --- |
+| **1920 px** | centred max-width editorial composition; radius remains dominant |
+| **1440 / 1280 px** | three-column story with fluid column minimums |
+| **768 px** | one-column visual flow; chapter controls become a 2×2 grid; observation content stacks |
+| **375 px** | compact two-column chapter controls, one-column receipts/archive, mobile bottom sheet |
+| **320 px** | secondary metadata simplifies; controls stay within viewport; no page-level horizontal scrolling |
+
+Thread chips intentionally remain horizontally scrollable on small screens because they are a peer filter set; the page itself does not rely on horizontal scrolling. Interactive controls use 44 px minimum touch targets for coarse pointers.
+
+## Verification checklist
+
+For the final post-evaluation repair matrix and QA notes, see [`AUDIT.md`](./AUDIT.md).
+
+
+Before deployment, run:
+
+```bash
+npm run check
+```
+
+That command validates the processed dataset, verifies the benchmark medians, runs repository/privacy preflight checks, performs dependency-free submission linting and the final architecture/responsive audit, runs TypeScript validation, and creates the production Vite build. After building, `npm run preview` should be checked at 320, 375, 768, 1280, 1440, and 1920 px.
+
+Manual interaction checks cover: landing CTA, chapter selection, timeline mouse/touch/keyboard control, thread filters, archive search/filter/sort, evidence-dialog focus trapping and dismissal, reduced motion, direct hash routes, page refresh, empty results, loading/error states, and absence of horizontal page overflow.
+
 ## Repository structure
 
 ```text
+public/
+└── data/
+    └── anonymous37.json       # optimised deployed evidence asset
 src/
+├── app/
+│   ├── AppShell.tsx
+│   ├── useArchiveData.ts
+│   └── useHashView.ts
+├── features/
+│   ├── landing/LandingView.tsx
+│   ├── story/StoryView.tsx
+│   ├── archive/ArchiveView.tsx
+│   └── methodology/MethodologyView.tsx
 ├── components/
 │   ├── ArchiveExplorer.tsx
 │   ├── ChapterNavigator.tsx
@@ -226,24 +295,21 @@ src/
 │   ├── ThreadSelector.tsx
 │   └── TimeScrubber.tsx
 ├── data/
-│   ├── anonymous37.json
+│   ├── archiveRepository.ts
 │   └── chapters.ts
 ├── hooks/
-│   ├── useReceiptSearch.ts
-│   ├── useReducedMotion.ts
-│   └── useTimeline.ts
 ├── lib/
-│   ├── connections.ts
-│   ├── formatters.ts
-│   ├── metrics.ts
-│   └── radius.ts
+├── styles/
+│   └── responsive.css
 ├── types/
-│   └── receipts.ts
 ├── App.tsx
 ├── main.tsx
 └── styles.css
 scripts/
+├── lint.py
 ├── prepare_data.py
+├── preflight.py
+├── validate_data.py
 └── verify_data.py
 ```
 
