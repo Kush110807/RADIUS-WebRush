@@ -1,0 +1,38 @@
+{
+  "name": "radius-life-receipts",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "preview": "vite preview",
+    "prepare:data": "python scripts/prepare_data.py",
+    "validate:data": "python scripts/validate_data.py",
+    "check": "npm run validate:data && npm run preflight && npm run typecheck && npm run build",
+    "verify:data": "python scripts/verify_data.py",
+    "preflight": "python scripts/preflight.py"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "5.2.8",
+    "@fontsource-variable/newsreader": "5.2.8",
+    "lucide-react": "0.468.0",
+    "motion": "12.23.12",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.13",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
+    "@vitejs/plugin-react": "5.0.4",
+    "tailwindcss": "4.1.13",
+    "typescript": "5.9.2",
+    "vite": "7.1.7"
+  },
+  "description": "An interactive editorial archive showing how one anonymous student\u2019s recorded daily radius contracted and expanded across four years.",
+  "engines": {
+    "node": ">=22.12"
+  }
+}
