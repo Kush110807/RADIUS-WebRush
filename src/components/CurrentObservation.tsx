@@ -90,38 +90,48 @@ export default function CurrentObservation({
     <aside className="observation" aria-label="Current observation">
       <motion.div
         key={receipt.chapter}
+        className="observation-block observation-what"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduce ? 0.01 : 0.24 }}
       >
         <p className="eyebrow">{fmtDate(receipt.date)}</p>
+        <p className="observation-step">What happened</p>
         <h2>{chapter.status}</h2>
         <p className="observation-copy">{chapter.observation}</p>
+      </motion.div>
+
+      <div className="observation-block observation-support">
+        <p className="observation-step">What supports it</p>
         <p className="chapter-compare">{chapterComparison(receipt, data)}</p>
         <div className="pattern-link">
           <span>Signal connection</span>
           <p>{pattern}</p>
         </div>
-        <p className="qualification">{chapter.interpretation}</p>
-      </motion.div>
 
-      <div className="receipt-stack" aria-label={`${thread} supporting receipts`}>
-        {Array.from({ length: count }, (_, index) => (
-          <motion.div
-            key={`${thread}-${index}`}
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduce ? 0.01 : 0.2, delay: reduce ? 0 : index * 0.045 }}
-          >
-            <ReceiptCard
-              receipt={receipt}
-              thread={thread}
-              baseline={data.chapterMedians.before}
-              compact={index > 0}
-              metricIndex={index}
-            />
-          </motion.div>
-        ))}
+        <div className="receipt-stack" aria-label={`${thread} supporting receipts`}>
+          {Array.from({ length: count }, (_, index) => (
+            <motion.div
+              key={`${thread}-${index}`}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: reduce ? 0.01 : 0.2, delay: reduce ? 0 : index * 0.045 }}
+            >
+              <ReceiptCard
+                receipt={receipt}
+                thread={thread}
+                baseline={data.chapterMedians.before}
+                compact={index > 0}
+                metricIndex={index}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      <div className="observation-block observation-limits">
+        <p className="observation-step">Interpretation limits</p>
+        <p className="qualification">{chapter.interpretation}</p>
       </div>
 
       <button className="evidence-button" type="button" onClick={onEvidence}>

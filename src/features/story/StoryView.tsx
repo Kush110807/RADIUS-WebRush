@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import { BookOpen } from 'lucide-react'
 import type { AppView } from '../../app/useHashView'
 import type { ChapterId, DataPayload, ThreadId } from '../../types/receipts'
 import { chapters, chapterColors } from '../../data/chapters'
 import { fmtDate } from '../../lib/formatters'
+import { chapterAnchors } from '../../lib/anchors'
 import { useTimeline } from '../../hooks/useTimeline'
 import LivingRadius from '../../components/LivingRadius'
 import ChapterNavigator from '../../components/ChapterNavigator'
@@ -26,14 +27,12 @@ export default function StoryView({
   const [thread, setThread] = useState<ThreadId>('movement')
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [announcement, setAnnouncement] = useState('')
+  const [showFingerprint, setShowFingerprint] = useState(true)
+  const [scrubbing, setScrubbing] = useState(false)
+  const scrubTimer = useRef<number | null>(null)
   const { current, previous } = useTimeline(data.records, index)
 
-  const chapterStart = useMemo(
-    () => Object.fromEntries(
-      chapters.map((chapter) => [chapter.id, data.records.findIndex((record) => record.chapter === chapter.id)]),
-    ) as Record<ChapterId, number>,
-    [data.records],
-  )
+  const chapterStart = useMemo(() => chapterAnchors(data.records), [data.records])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -41,6 +40,19 @@ export default function StoryView({
     }, 180)
     return () => window.clearTimeout(timer)
   }, [current.date, current.chapter, current.radiusScore])
+
+  useEffect(() => () => {
+    if (scrubTimer.current) window.clearTimeout(scrubTimer.current)
+  }, [])
+
+  const handleScrub = useCallback((next: number) => {
+    setIndex(next)
+    setScrubbing(true)
+    if (scrubTimer.current) window.clearTimeout(scrubTimer.current)
+    scrubTimer.current = window.setTimeout(() => setScrubbing(false), 220)
+  }, [])
+
+  const toggleFingerprint = useCallback(() => setShowFingerprint((value) => !value), [])
 
   const selectChapter = (chapter: ChapterId) => {
     const nextIndex = chapterStart[chapter]
@@ -67,12 +79,15 @@ export default function StoryView({
             thread={thread}
             baselineScore={data.normalisation.baselineRadiusScore}
             baselineMedians={data.chapterMedians.before}
+            showFingerprint={showFingerprint}
+            onToggleFingerprint={toggleFingerprint}
+            scrubbing={scrubbing}
           />
           <ThreadSelector value={thread} onChange={setThread} />
         </motion.section>
         <CurrentObservation receipt={current} thread={thread} data={data} onEvidence={() => setEvidenceOpen(true)} />
       </div>
-      <TimeScrubber records={data.records} index={index} onChange={setIndex} />
+      <TimeScrubber records={data.records} index={index} onChange={handleScrub} />
       <nav className="story-footer" aria-label="Secondary navigation">
         <button type="button" onClick={() => onNavigate('archive')}><BookOpen size={16} aria-hidden="true" />Explore all receipts</button>
         <span>{data.range.start} → {data.range.end}</span>

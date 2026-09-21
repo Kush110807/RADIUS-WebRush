@@ -24,10 +24,10 @@ export default function EvidenceDrawer({
   const panelRef = useRef<HTMLElement | null>(null)
   const restoreRef = useRef<HTMLElement | null>(null)
   const reduce = useReducedMotion()
-  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && matchMedia('(max-width: 650px)').matches)
+  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && matchMedia('(max-width: 560px)').matches)
 
   useEffect(() => {
-    const query = matchMedia('(max-width: 650px)')
+    const query = matchMedia('(max-width: 560px)')
     const sync = () => setMobile(query.matches)
     sync()
     query.addEventListener('change', sync)

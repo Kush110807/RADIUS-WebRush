@@ -107,7 +107,7 @@ svg, img { max-width:100%; }
 
   .landing { min-height:calc(100svh - 60px); padding:34px 16px 20px; gap:10px; }
   .hero-copy h1 { font-size:clamp(3.15rem,17vw,4.9rem); line-height:.84; }
-  .hero-support { font-size:.8rem; line-height:1.62; }
+  .hero-support { font-size:.92rem; line-height:1.62; }
   .primary-cta { width:100%; min-height:50px; justify-content:space-between; }
   .hero-visual { min-height:330px; }
   .hero-radius-field { width:min(82vw,350px); }
@@ -120,10 +120,10 @@ svg, img { max-width:100%; }
   .chapters { overflow:visible; }
   .chapters ol { display:grid; width:100%; min-width:0; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
   .chapter-button { min-width:0; min-height:60px; }
-  .chapter-copy strong { font-size:.68rem; }
-  .chapter-copy small { font-size:.57rem; white-space:normal; line-height:1.25; }
+  .chapter-copy strong { font-size:.8rem; }
+  .chapter-copy small { font-size:.725rem; white-space:normal; line-height:1.25; }
   .visual-heading h1 { font-size:clamp(1.55rem,7vw,2rem); }
-  .visual-heading > span { padding:6px 8px; font-size:.58rem; }
+  .visual-heading > span { padding:6px 8px; font-size:.73rem; }
   .radius-figure { width:min(100%,420px); }
   .signature-legend { justify-content:flex-start; padding-inline:0; }
   .thread-strip { margin-top:10px; }
@@ -156,7 +156,7 @@ svg, img { max-width:100%; }
   .landing { padding-inline:14px; }
   .hero-copy h1 { font-size:clamp(3rem,16.5vw,4rem); }
   .hero-radius-field { width:min(86vw,320px); }
-  .visual-heading > span { font-size:.54rem; }
+  .visual-heading > span { font-size:.71rem; }
   .chapter-copy small { display:none; }
   .receipt-main { align-items:flex-start; flex-direction:column; gap:5px; }
   .receipt-main b { white-space:normal; }
@@ -187,4 +187,16 @@ svg, img { max-width:100%; }
 
 @media (prefers-reduced-motion: reduce) {
   .system-orbit { box-shadow:none; }
+}
+
+@media (min-width: 1180px) {
+  .observation > .observation-what { grid-column:1; grid-row:1; }
+  .observation > .observation-support { grid-column:1; grid-row:2; }
+  .observation > .observation-limits { grid-column:2; grid-row:2; align-self:end; }
+  .observation > .evidence-button { grid-column:2; grid-row:1; align-self:start; }
+}
+@media (max-width: 560px) {
+  .radius-key { gap:7px; }
+  .radius-key li { font-size:.78rem; }
+  .scrub-bubble { font-size:.74rem; }
 }

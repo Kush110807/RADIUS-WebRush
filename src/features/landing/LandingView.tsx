@@ -30,8 +30,14 @@ export default function LandingView({
         <p className="hero-tagline">The year a life folded inward.</p>
         <p className="hero-support">Four years. 1,227 days. One anonymous student. Thousands of digital traces.</p>
         <button className="primary-cta" type="button" onClick={onEnter}>
-          Enter the archive <ArrowRight aria-hidden="true" />
+          Enter the story <ArrowRight aria-hidden="true" />
         </button>
+        <ul className="radius-key" aria-label="How to read the living radius">
+          <li><i className="key-large" aria-hidden="true" />A <b>larger circle</b> means a broader recorded physical world that day.</li>
+          <li><i className="key-small" aria-hidden="true" />A <b>smaller circle</b> means a contracted one.</li>
+          <li><i className="key-dotted" aria-hidden="true" />The <b>dotted ring</b> is the typical day before March 2020.</li>
+          <li><i className="key-drag" aria-hidden="true" />Dragging through time changes the recorded radius.</li>
+        </ul>
         <span className="quiet-instruction">Drag through four years of digital traces</span>
       </section>
 

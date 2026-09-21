@@ -5,7 +5,6 @@ export default function Methodology({ data, onBack }: { data: DataPayload; onBac
 
   return (
     <>
-      <a className="skip-link" href="#main-content">Skip to methodology</a>
       <main className="methodology-view" id="main-content">
         <div className="methodology-wrap">
           <button className="text-button" type="button" onClick={onBack}>← Back to story</button>

@@ -1,4 +1,4 @@
-import { useMemo, type ChangeEvent } from 'react'
+import { useMemo, useState, type ChangeEvent } from 'react'
 import type { LifeReceipt } from '../types/receipts'
 import { chapterColors } from '../data/chapters'
 import { fmtDate } from '../lib/formatters'
@@ -16,6 +16,7 @@ export default function TimeScrubber({
   onChange: (next: number) => void
 }) {
   const current = records[index]
+  const [active, setActive] = useState(false)
   const denominator = Math.max(1, records.length - 1)
   const pct = (index / denominator) * 100
 
@@ -70,7 +71,16 @@ export default function TimeScrubber({
         <span>{index + 1} / {records.length} recorded days</span>
       </div>
 
-      <div className="range-wrap">
+      <div className={`range-wrap ${active ? 'is-active' : ''}`}>
+        <div
+          className="scrub-bubble"
+          aria-hidden="true"
+          style={{ left: `${pct}%`, borderColor: chapterColors[current.chapter] }}
+        >
+          <b>{fmtDate(current.date, false)}</b>
+          <em>{current.radiusScore == null ? 'No radius' : `Radius ${Math.round(current.radiusScore)}`}</em>
+        </div>
+
         <div className="range-track" aria-hidden="true">
           <span className="range-fill" style={{ width: `${pct}%` }} />
           <span className="density-marks">
@@ -98,13 +108,18 @@ export default function TimeScrubber({
         <input
           aria-label="Life-receipt date"
           aria-describedby="timeline-help"
-          aria-valuetext={`${fmtDate(current.date)}, ${current.chapter} chapter`}
+          aria-valuetext={`${fmtDate(current.date)}, ${current.chapter} chapter, radius ${current.radiusScore == null ? 'unavailable' : Math.round(current.radiusScore)}`}
           type="range"
           min="0"
           max={records.length - 1}
           step="1"
           value={index}
           onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(Number(event.target.value))}
+          onFocus={() => setActive(true)}
+          onBlur={() => setActive(false)}
+          onPointerDown={() => setActive(true)}
+          onPointerUp={() => setActive(false)}
+          onPointerCancel={() => setActive(false)}
         />
         <span className="sr-only" id="timeline-help">Use arrow keys for nearby recorded days. Home and End jump to the first and last record.</span>
       </div>

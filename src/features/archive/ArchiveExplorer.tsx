@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type CSSProperties } from 'react'
+import { useEffect, useState, type ChangeEvent, type CSSProperties } from 'react'
 import { Search, X, Inbox } from 'lucide-react'
 import type { ChapterId, DataPayload, LifeReceipt, ThreadId } from '../../types/receipts'
 import { chapters, chapterColors } from '../../data/chapters'
@@ -7,14 +7,20 @@ import { useReceiptSearch } from '../../hooks/useReceiptSearch'
 import { fmtDate } from '../../lib/formatters'
 import EvidenceDrawer from '../../components/EvidenceDrawer'
 
+const BATCH = 60
+
 export default function ArchiveExplorer({ data, onBack }: { data: DataPayload; onBack: () => void }) {
   const [query, setQuery] = useState('')
   const [chapter, setChapter] = useState<ChapterId | 'all'>('all')
   const [thread, setThread] = useState<ThreadId | 'all'>('all')
   const [sort, setSort] = useState<'date-desc' | 'date-asc' | 'unusual'>('date-desc')
   const [selected, setSelected] = useState<LifeReceipt | null>(null)
+  const [limit, setLimit] = useState(BATCH)
   const results = useReceiptSearch(data.records, query, chapter, thread, sort, data.chapterMedians.before)
-  const visible = results.slice(0, 180)
+
+  useEffect(() => { setLimit(BATCH) }, [query, chapter, thread, sort])
+
+  const visible = results.slice(0, limit)
   const activeThread: ThreadId = thread === 'all' ? 'movement' : thread
   const previewSpecs: MetricSpec[] = thread === 'all'
     ? [metricSpecs.movement[0], metricSpecs.attention[0], metricSpecs.emotion[0]]
@@ -22,7 +28,6 @@ export default function ArchiveExplorer({ data, onBack }: { data: DataPayload; o
 
   return (
     <>
-      <a className="skip-link" href="#main-content">Skip to archive results</a>
       <main className="archive-view" id="main-content">
         <header className="archive-header">
           <div>
@@ -138,7 +143,12 @@ export default function ArchiveExplorer({ data, onBack }: { data: DataPayload; o
         )}
 
         {results.length > visible.length && (
-          <p className="archive-limit">Showing the first {visible.length} results for performance. Refine your search to inspect a specific period.</p>
+          <div className="archive-more">
+            <p>Showing {visible.length.toLocaleString()} of {results.length.toLocaleString()} matching days.</p>
+            <button type="button" onClick={() => setLimit((value) => value + BATCH)}>
+              Load {Math.min(BATCH, results.length - visible.length)} more receipts
+            </button>
+          </div>
         )}
         {selected && (
           <EvidenceDrawer open={Boolean(selected)} onClose={() => setSelected(null)} receipt={selected} thread={activeThread} data={data} />
