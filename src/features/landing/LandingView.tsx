@@ -32,13 +32,15 @@ export default function LandingView({
         <button className="primary-cta" type="button" onClick={onEnter}>
           Enter the story <ArrowRight aria-hidden="true" />
         </button>
-        <ul className="radius-key" aria-label="How to read the living radius">
-          <li><i className="key-large" aria-hidden="true" />A <b>larger circle</b> means a broader recorded physical world that day.</li>
-          <li><i className="key-small" aria-hidden="true" />A <b>smaller circle</b> means a contracted one.</li>
-          <li><i className="key-dotted" aria-hidden="true" />The <b>dotted ring</b> is the typical day before March 2020.</li>
-          <li><i className="key-drag" aria-hidden="true" />Dragging through time changes the recorded radius.</li>
-        </ul>
-        <span className="quiet-instruction">Drag through four years of digital traces</span>
+        <div className="radius-key-wrap">
+          <p className="radius-key-title">How to read the radius</p>
+          <ul className="radius-key" aria-label="How to read the living radius">
+            <li><i className="key-large" aria-hidden="true" /><b>Larger circle</b><span>Broader recorded physical world that day</span></li>
+            <li><i className="key-small" aria-hidden="true" /><b>Smaller circle</b><span>More contracted recorded world</span></li>
+            <li><i className="key-dotted" aria-hidden="true" /><b>Dotted ring</b><span>Typical recorded day before March 2020</span></li>
+            <li><i className="key-drag" aria-hidden="true" /><b>Drag through time</b><span>See how the recorded radius changes</span></li>
+          </ul>
+        </div>
       </section>
 
       <motion.section
@@ -49,7 +51,7 @@ export default function LandingView({
         <div className="hero-radius-field" aria-hidden="true">
           <div className="hero-gridline hero-gridline-a" />
           <div className="hero-gridline hero-gridline-b" />
-          <div className="hero-reference-ring"><span>BEFORE</span><b>{Math.round(beforeRadius)}</b></div>
+          <div className="hero-reference-ring"><span>BEFORE · {Math.round(beforeRadius)}</span><b aria-hidden="true">{Math.round(beforeRadius)}</b></div>
           <motion.div
             className="hero-collapse-ring"
             style={{ width: `${collapseRatio * 100}%`, height: `${collapseRatio * 100}%` }}
@@ -57,14 +59,15 @@ export default function LandingView({
             animate={{ scale: 1, opacity: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 1.25, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span>FIRST LOCKDOWN</span><b>{Math.round(collapseRadius)}</b>
+            <span>FIRST LOCKDOWN · {Math.round(collapseRadius)}</span><b aria-hidden="true">{Math.round(collapseRadius)}</b>
           </motion.div>
           <div className="hero-home-core">HOME</div>
         </div>
         <div className="hero-caption">
           <strong><span>{Math.round(beforeRadius)}</span><i aria-hidden="true">→</i><span>{Math.round(collapseRadius)}</span></strong>
-          <b>median living-radius score</b>
-          <span>Before → first lockdown · visual storytelling score</span>
+          <b>Median living-radius score</b>
+          <span>Before → first lockdown</span>
+          <small>Visual storytelling score</small>
         </div>
       </motion.section>
 
