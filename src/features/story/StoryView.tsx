@@ -3,9 +3,10 @@ import { motion } from 'motion/react'
 import { BookOpen } from 'lucide-react'
 import type { AppView } from '../../app/useHashView'
 import type { ChapterId, DataPayload, ThreadId } from '../../types/receipts'
-import { chapters, chapterColors } from '../../data/chapters'
+import { chapters } from '../../data/chapters'
 import { fmtDate } from '../../lib/formatters'
 import { chapterAnchors } from '../../lib/anchors'
+import { metricSpecs } from '../../lib/metrics'
 import { useTimeline } from '../../hooks/useTimeline'
 import LivingRadius from '../../components/LivingRadius'
 import ChapterNavigator from '../../components/ChapterNavigator'
@@ -27,12 +28,19 @@ export default function StoryView({
   const [thread, setThread] = useState<ThreadId>('movement')
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [announcement, setAnnouncement] = useState('')
-  const [showFingerprint, setShowFingerprint] = useState(true)
+  const [showFingerprint, setShowFingerprint] = useState(false)
   const [scrubbing, setScrubbing] = useState(false)
   const scrubTimer = useRef<number | null>(null)
   const { current, previous } = useTimeline(data.records, index)
 
   const chapterStart = useMemo(() => chapterAnchors(data.records), [data.records])
+  const evidenceCounts = useMemo(() => {
+    const ids = Object.keys(metricSpecs) as ThreadId[]
+    return Object.fromEntries(ids.map((id) => {
+      const count = data.records.filter((record) => metricSpecs[id].some((spec) => typeof record[spec.key] === 'number')).length
+      return [id, count]
+    })) as Record<ThreadId, number>
+  }, [data.records])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -59,18 +67,22 @@ export default function StoryView({
     if (nextIndex >= 0) setIndex(nextIndex)
   }
 
+  const chapter = chapters.find((item) => item.id === current.chapter)
+
   return (
     <motion.main id="main-content" className={`story chapter-${current.chapter}`} key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="story-grid">
         <ChapterNavigator active={current.chapter} onSelect={selectChapter} />
         <motion.section layoutId={reduceMotion ? undefined : 'radius-frame'} className="visual-stage" aria-labelledby="story-date">
-          <div className="visual-heading">
+          <div className="visual-heading visual-heading-final">
             <div>
-              <p className="eyebrow">Living radius · {chapters.find((chapter) => chapter.id === current.chapter)?.name}</p>
-              <h1 id="story-date">{fmtDate(current.date)}</h1>
+              <p className="eyebrow">Living radius</p>
+              <h1 id="story-date">{chapter?.name}</h1>
+              <p>{fmtDate(current.date)} · Explore how the recorded world changes through time.</p>
             </div>
-            <span style={{ borderColor: chapterColors[current.chapter] }}>
-              {current.radiusScore == null ? 'No radius' : `${Math.round(current.radiusScore)} / 100`}
+            <span className="visual-score-pill">
+              <b>{current.radiusScore == null ? '—' : Math.round(current.radiusScore)}</b>
+              <small>/100</small>
             </span>
           </div>
           <LivingRadius
@@ -83,7 +95,7 @@ export default function StoryView({
             onToggleFingerprint={toggleFingerprint}
             scrubbing={scrubbing}
           />
-          <ThreadSelector value={thread} onChange={setThread} />
+          <ThreadSelector value={thread} onChange={setThread} counts={evidenceCounts} />
         </motion.section>
         <CurrentObservation receipt={current} thread={thread} data={data} onEvidence={() => setEvidenceOpen(true)} />
       </div>

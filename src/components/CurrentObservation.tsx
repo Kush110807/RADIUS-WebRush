@@ -1,73 +1,37 @@
+import type { CSSProperties } from 'react'
 import { motion } from 'motion/react'
-import { ChevronRight, ScanSearch } from 'lucide-react'
+import { ChevronRight, Info, ScanSearch } from 'lucide-react'
 import type { DataPayload, LifeReceipt, ThreadId } from '../types/receipts'
 import { chapters } from '../data/chapters'
 import { fmtDate } from '../lib/formatters'
 import { metricSpecs, threads } from '../lib/metrics'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import ReceiptCard from './ReceiptCard'
 
 function chapterComparison(receipt: LifeReceipt, data: DataPayload) {
   const base = data.chapterMedians.before
   const here = data.chapterMedians[receipt.chapter]
 
   if (receipt.chapter === 'before') {
-    return `Reference pattern: ${base.distanceKm?.toFixed(2)} km travelled, ${base.placesVisited?.toFixed(0)} places visited, ${base.movementMinutes?.toFixed(0)} minutes on foot and ${base.homeHours?.toFixed(2)} hours at home on a median recorded day.`
+    return 'This chapter is the reference pattern used to compare later periods.'
   }
 
   const distancePct = base.distanceKm && here.distanceKm != null
     ? Math.round(((here.distanceKm - base.distanceKm) / base.distanceKm) * 100)
     : null
-  const homeDiff = base.homeHours != null && here.homeHours != null
-    ? here.homeHours - base.homeHours
-    : null
-  const placesDiff = base.placesVisited != null && here.placesVisited != null
-    ? here.placesVisited - base.placesVisited
-    : null
+  const homeDiff = base.homeHours != null && here.homeHours != null ? here.homeHours - base.homeHours : null
+  const placesDiff = base.placesVisited != null && here.placesVisited != null ? here.placesVisited - base.placesVisited : null
 
   if (receipt.chapter === 'collapse') {
-    return `Compared with Before, median travel is ${distancePct == null ? 'lower' : `${Math.abs(distancePct)}% lower`}; home time is ${homeDiff == null ? 'higher' : `${homeDiff.toFixed(1)} hours higher`}; and the median number of places falls by ${Math.abs(placesDiff ?? 0).toFixed(0)}.`
+    return `Median travel is ${distancePct == null ? 'lower' : `${Math.abs(distancePct)}% lower`} than Before${homeDiff == null ? '' : `, while home time is ${Math.abs(homeDiff).toFixed(1)} hours higher`}${placesDiff == null ? '' : ` and places visited fall by ${Math.abs(placesDiff).toFixed(0)}`}.`
   }
-
   if (receipt.chapter === 'adaptation') {
-    return `Compared with Before, the median day still reaches only ${here.placesVisited?.toFixed(0)} places and about ${here.movementMinutes?.toFixed(0)} minutes on foot, while home time remains ${homeDiff?.toFixed(1)} hours higher.`
+    return `The routine stays narrower than Before, with fewer places reached and more time concentrated close to home.`
   }
-
-  return `Compared with Before, the median day returns to ${here.placesVisited?.toFixed(0)} places, reaches ${here.distanceKm?.toFixed(2)} km of travel, and records about ${here.movementMinutes?.toFixed(0)} minutes on foot.`
+  return 'The recorded world expands again, though not every signal returns to its earlier pattern.'
 }
 
-function dailyPattern(receipt: LifeReceipt, thread: ThreadId, baseline: Record<string, number | null>) {
-  const comparisons = metricSpecs[thread].flatMap((spec) => {
-    const raw = receipt[spec.key]
-    const value = typeof raw === 'number' ? raw : null
-    const reference = baseline[String(spec.key)] ?? null
-    if (value == null || reference == null || reference === 0) return []
-    const delta = ((value - reference) / Math.abs(reference)) * 100
-    return [{ label: spec.label, delta }]
-  })
-
-  if (!comparisons.length) {
-    return `This day does not contain enough comparable ${threads.find((item) => item.id === thread)?.label.toLowerCase()} evidence for a daily pattern link.`
-  }
-
-  if (thread === 'movement') {
-    const home = comparisons.find((item) => item.label === 'Time at home')
-    const outward = comparisons.filter((item) => ['Distance travelled', 'Places visited', 'Detected movement on foot'].includes(item.label))
-    if (home && home.delta > 10 && outward.length >= 2 && outward.every((item) => item.delta < -10)) {
-      return 'Connected receipts: outward movement is below the Before median while time at home moves in the opposite direction.'
-    }
-  }
-
-  const below = comparisons.filter((item) => item.delta < -10).length
-  const above = comparisons.filter((item) => item.delta > 10).length
-  const near = comparisons.length - below - above
-  const parts = [
-    below ? `${below} below` : '',
-    above ? `${above} above` : '',
-    near ? `${near} near` : '',
-  ].filter(Boolean)
-
-  return `Connected receipts: ${parts.join(', ')} the Before median across ${comparisons.length} comparable ${thread} signal${comparisons.length === 1 ? '' : 's'} recorded today.`
+function formatMetric(value: number, unit: string, digits = 0) {
+  return `${value.toFixed(digits)}${unit}`
 }
 
 export default function CurrentObservation({
@@ -82,61 +46,73 @@ export default function CurrentObservation({
   onEvidence: () => void
 }) {
   const chapter = chapters.find((item) => item.id === receipt.chapter)!
-  const count = Math.min(3, metricSpecs[thread].length)
   const reduce = useReducedMotion()
-  const pattern = dailyPattern(receipt, thread, data.chapterMedians.before)
+  const threadMeta = threads.find((item) => item.id === thread)!
+  const baseline = data.chapterMedians.before
+
+  const signals = metricSpecs[thread].flatMap((spec) => {
+    const raw = receipt[spec.key]
+    const value = typeof raw === 'number' ? raw : null
+    const reference = baseline[String(spec.key)] ?? null
+    if (value == null) return []
+    const delta = reference == null || reference === 0 ? null : ((value - reference) / Math.abs(reference)) * 100
+    return [{
+      key: String(spec.key),
+      label: spec.label,
+      value: formatMetric(value, spec.unit, spec.digits ?? 0),
+      delta,
+    }]
+  }).slice(0, 4)
 
   return (
-    <aside className="observation" aria-label="Current observation">
+    <aside className="observation observation-final" aria-label="Current observation" style={{ '--thread': threadMeta.color } as CSSProperties}>
+      <div className="observation-tabs" role="presentation">
+        <span className="active">Observation</span>
+        <span>Evidence</span>
+        <span>Context</span>
+      </div>
+
       <motion.div
         key={receipt.chapter}
-        className="observation-block observation-what"
+        className="observation-hero"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduce ? 0.01 : 0.24 }}
       >
-        <p className="eyebrow">{fmtDate(receipt.date)}</p>
-        <p className="observation-step">What happened</p>
+        <p className="eyebrow">{fmtDate(receipt.date)} · {chapter.name}</p>
         <h2>{chapter.status}</h2>
-        <p className="observation-copy">{chapter.observation}</p>
+        <p>{chapter.observation}</p>
       </motion.div>
 
-      <div className="observation-block observation-support">
-        <p className="observation-step">What supports it</p>
-        <p className="chapter-compare">{chapterComparison(receipt, data)}</p>
-        <div className="pattern-link">
-          <span>Signal connection</span>
-          <p>{pattern}</p>
+      <section className="observation-section">
+        <div className="observation-section-title">
+          <span className="observation-section-icon">{(() => { const Icon = threadMeta.icon; return <Icon size={15} aria-hidden="true" /> })()}</span>
+          <div><p>Selected thread</p><h3>{threadMeta.label}</h3></div>
         </div>
-
-        <div className="receipt-stack" aria-label={`${thread} supporting receipts`}>
-          {Array.from({ length: count }, (_, index) => (
-            <motion.div
-              key={`${thread}-${index}`}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reduce ? 0.01 : 0.2, delay: reduce ? 0 : index * 0.045 }}
-            >
-              <ReceiptCard
-                receipt={receipt}
-                thread={thread}
-                baseline={data.chapterMedians.before}
-                compact={index > 0}
-                metricIndex={index}
-              />
-            </motion.div>
-          ))}
+        <p className="thread-definition">{threadMeta.description}.</p>
+        <div className="signal-list" aria-label={`${threadMeta.label} signals on this date`}>
+          {signals.length ? signals.map((signal) => (
+            <div className="signal-row" key={signal.key}>
+              <span><b>{signal.label}</b><small>{signal.delta == null ? 'No Before comparison' : `${Math.abs(Math.round(signal.delta))}% ${signal.delta >= 0 ? 'above' : 'below'} Before`}</small></span>
+              <strong>{signal.value}</strong>
+            </div>
+          )) : <p className="signal-empty">No {threadMeta.label.toLowerCase()} signals were recorded on this date.</p>}
         </div>
-      </div>
+      </section>
 
-      <div className="observation-block observation-limits">
-        <p className="observation-step">Interpretation limits</p>
-        <p className="qualification">{chapter.interpretation}</p>
-      </div>
+      <section className="observation-section observation-meaning">
+        <p className="section-kicker">What this adds to the story</p>
+        <p>{chapterComparison(receipt, data)}</p>
+      </section>
 
-      <button className="evidence-button" type="button" onClick={onEvidence}>
+      <section className="observation-section observation-limits-final">
+        <div className="limit-title"><Info size={15} aria-hidden="true" /><span>Interpretation limits</span></div>
+        <p>{chapter.interpretation}</p>
+      </section>
+
+      <button className="evidence-button evidence-button-final" type="button" onClick={onEvidence}>
         <ScanSearch size={18} aria-hidden="true" />
-        Show the evidence
+        Open source evidence
         <ChevronRight size={15} aria-hidden="true" />
       </button>
     </aside>

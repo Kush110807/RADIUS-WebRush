@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { Check } from 'lucide-react'
 import { motion } from 'motion/react'
 import { threads } from '../lib/metrics'
 import type { ThreadId } from '../types/receipts'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
-export default function ThreadSelector({ value, onChange }: { value: ThreadId; onChange: (v: ThreadId) => void }) {
+export default function ThreadSelector({
+  value,
+  onChange,
+  counts,
+}: {
+  value: ThreadId
+  onChange: (v: ThreadId) => void
+  counts?: Partial<Record<ThreadId, number>>
+}) {
   const reduce = useReducedMotion()
   const stripRef = useRef<HTMLDivElement | null>(null)
   const [edges, setEdges] = useState({ start: false, end: false })
@@ -36,12 +45,19 @@ export default function ThreadSelector({ value, onChange }: { value: ThreadId; o
   }, [value, reduce])
 
   return (
-    <div className={`thread-strip-wrap ${edges.start ? 'fade-start' : ''} ${edges.end ? 'fade-end' : ''}`}>
-      <p className="thread-strip-label" id="thread-strip-label">Filter the evidence thread</p>
-      <nav className="thread-strip" aria-labelledby="thread-strip-label" ref={stripRef}>
+    <section className={`thread-strip-wrap ${edges.start ? 'fade-start' : ''} ${edges.end ? 'fade-end' : ''}`} aria-labelledby="thread-strip-label">
+      <div className="thread-strip-heading">
+        <div>
+          <p className="thread-strip-kicker">Evidence explorer</p>
+          <h2 id="thread-strip-label">Filter the evidence thread</h2>
+        </div>
+        <p>Select a lens to change the signals explained in the chart and observation panel.</p>
+      </div>
+      <nav className="thread-strip" aria-label="Evidence threads" ref={stripRef}>
         {threads.map((thread) => {
           const Icon = thread.icon
           const active = value === thread.id
+          const count = counts?.[thread.id]
           return (
             <button
               key={thread.id}
@@ -51,19 +67,28 @@ export default function ThreadSelector({ value, onChange }: { value: ThreadId; o
               onClick={() => onChange(thread.id)}
               style={{ '--thread': thread.color } as CSSProperties}
             >
-              <Icon size={16} aria-hidden="true" />
-              <span>{thread.label}</span>
+              <span className="thread-icon" aria-hidden="true"><Icon size={19} /></span>
+              <span className="thread-copy">
+                <span className="thread-name-row">
+                  <strong>{thread.label}</strong>
+                  {count != null && <small>{count}</small>}
+                </span>
+                <em>{thread.shortDescription ?? thread.description}</em>
+              </span>
+              <span className="thread-state" aria-hidden="true">
+                {active ? <Check size={15} /> : <span />}
+              </span>
               {active && (
                 <motion.span
-                  layoutId="thread-dot"
-                  className="thread-dot"
-                  transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 360, damping: 28 }}
+                  layoutId="thread-active-rail"
+                  className="thread-active-rail"
+                  transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 360, damping: 30 }}
                 />
               )}
             </button>
           )
         })}
       </nav>
-    </div>
+    </section>
   )
 }
