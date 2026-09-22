@@ -60,30 +60,25 @@ export default function StoryView({
     scrubTimer.current = window.setTimeout(() => setScrubbing(false), 220)
   }, [])
 
-  const toggleFingerprint = useCallback(() => setShowFingerprint((value) => !value), [])
-
   const selectChapter = (chapter: ChapterId) => {
     const nextIndex = chapterStart[chapter]
     if (nextIndex >= 0) setIndex(nextIndex)
   }
 
-  const chapter = chapters.find((item) => item.id === current.chapter)
+  const chapter = chapters.find((item) => item.id === current.chapter)!
 
   return (
-    <motion.main id="main-content" className={`story chapter-${current.chapter}`} key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-      <div className="story-grid">
+    <motion.main id="main-content" className={`story story-v2 chapter-${current.chapter}`} key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      <div className="story-grid story-grid-v2">
         <ChapterNavigator active={current.chapter} onSelect={selectChapter} />
-        <motion.section layoutId={reduceMotion ? undefined : 'radius-frame'} className="visual-stage" aria-labelledby="story-date">
-          <div className="visual-heading visual-heading-final">
+        <motion.section layoutId={reduceMotion ? undefined : 'radius-frame'} className="visual-stage visual-stage-v2" aria-labelledby="story-date">
+          <div className="visual-heading visual-heading-v2">
             <div>
-              <p className="eyebrow">Living radius</p>
-              <h1 id="story-date">{chapter?.name}</h1>
-              <p>{fmtDate(current.date)} · Explore how the recorded world changes through time.</p>
+              <p className="eyebrow">Living radius · {chapter.number}</p>
+              <h1 id="story-date">{chapter.name}</h1>
+              <p>{fmtDate(current.date)} · Drag through time to see the recorded world expand and contract.</p>
             </div>
-            <span className="visual-score-pill">
-              <b>{current.radiusScore == null ? '—' : Math.round(current.radiusScore)}</b>
-              <small>/100</small>
-            </span>
+            <span className="score-definition-v2">0–100 storytelling score</span>
           </div>
           <LivingRadius
             receipt={current}
@@ -92,7 +87,7 @@ export default function StoryView({
             baselineScore={data.normalisation.baselineRadiusScore}
             baselineMedians={data.chapterMedians.before}
             showFingerprint={showFingerprint}
-            onToggleFingerprint={toggleFingerprint}
+            onToggleFingerprint={() => setShowFingerprint((value) => !value)}
             scrubbing={scrubbing}
           />
           <ThreadSelector value={thread} onChange={setThread} counts={evidenceCounts} />

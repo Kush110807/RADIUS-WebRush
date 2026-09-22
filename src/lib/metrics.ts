@@ -4,9 +4,9 @@ import { Footprints, MessageCircle, Moon, Smartphone, HeartPulse } from 'lucide-
 export const threads = [
   { id: 'movement' as ThreadId, label: 'Movement', icon: Footprints, color: '#72E6D1', shortDescription: 'Places · travel · range', description: 'Distance, places, movement and home time' },
   { id: 'connection' as ThreadId, label: 'Connection', icon: MessageCircle, color: '#63B8FF', shortDescription: 'Calls · messages · people', description: 'Calls, SMS and social reports' },
-  { id: 'rest' as ThreadId, label: 'Rest', icon: Moon, color: '#C187FF', shortDescription: 'Sleep · downtime', description: 'Model-estimated sleep' },
-  { id: 'attention' as ThreadId, label: 'Attention', icon: Smartphone, color: '#FFC44D', shortDescription: 'Unlocks · apps · focus', description: 'Unlocks and background-app observations' },
-  { id: 'emotion' as ThreadId, label: 'Emotion', icon: HeartPulse, color: '#FF6F91', shortDescription: 'Stress · affect · mood', description: 'Self-reported stress and affect' },
+  { id: 'rest' as ThreadId, label: 'Rest', icon: Moon, color: '#B78CFF', shortDescription: 'Sleep · downtime', description: 'Model-estimated sleep' },
+  { id: 'attention' as ThreadId, label: 'Attention', icon: Smartphone, color: '#F1C65B', shortDescription: 'Unlocks · apps · focus', description: 'Unlocks and background-app observations' },
+  { id: 'emotion' as ThreadId, label: 'Emotion', icon: HeartPulse, color: '#F27B94', shortDescription: 'Stress · affect · mood', description: 'Self-reported stress and affect' },
 ]
 
 export type MetricSpec = { key: keyof LifeReceipt; label: string; unit: string; digits?: number; qualification?: string; source: string }

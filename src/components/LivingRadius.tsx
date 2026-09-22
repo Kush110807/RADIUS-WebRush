@@ -1,14 +1,15 @@
-import { memo, useId, useMemo, type CSSProperties } from 'react'
-import { Home, ScanLine } from 'lucide-react'
+import { memo, useMemo, type CSSProperties } from 'react'
 import { motion } from 'motion/react'
+import { ChevronDown, ChevronUp, Home } from 'lucide-react'
 import type { LifeReceipt, ThreadId } from '../types/receipts'
-import { chapters, chapterColors } from '../data/chapters'
+import { chapterColors } from '../data/chapters'
 import { metricSpecs, threads } from '../lib/metrics'
-import { visualRadius } from '../lib/radius'
 import { fmtDate } from '../lib/formatters'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
-const shortMetricLabel = (label: string) => {
+const clamp = (min: number, max: number, value: number) => Math.max(min, Math.min(max, value))
+
+function compactMetricLabel(label: string) {
   const replacements: Record<string, string> = {
     'Distance travelled': 'Distance',
     'Places visited': 'Places',
@@ -50,179 +51,148 @@ function LivingRadius({
 }) {
   const reduce = useReducedMotion()
   const quiet = reduce || scrubbing
-  const glowId = useId().replace(/:/g, '')
-  const radius = visualRadius(receipt.radiusScore)
-  const baseline = visualRadius(baselineScore)
-  const chapter = chapters.find((item) => item.id === receipt.chapter)
-  const currentColor = chapterColors[receipt.chapter]
+  const currentScore = receipt.radiusScore
+  const baselineRadius = 174
+  const currentRadius = currentScore == null || baselineScore <= 0
+    ? 72
+    : clamp(60, 192, baselineRadius * (currentScore / baselineScore))
+  const isReference = receipt.chapter === 'before'
+  const currentColor = receipt.chapter === 'reopening' ? '#F1EDE4' : chapterColors[receipt.chapter]
   const threadMeta = threads.find((item) => item.id === thread)!
 
-  const signature = useMemo(() => {
-    const specs = metricSpecs[thread]
-      .map((spec) => {
-        const raw = receipt[spec.key]
-        const value = typeof raw === 'number' ? raw : null
-        const reference = baselineMedians[String(spec.key)] ?? null
-        if (value == null || reference == null || reference === 0) return null
-        return {
-          key: String(spec.key),
-          label: shortMetricLabel(spec.label),
-          delta: ((value - reference) / Math.abs(reference)) * 100,
-        }
-      })
-      .filter((item): item is NonNullable<typeof item> => item != null)
-      .slice(0, 5)
-
-    return specs.map((item, index) => {
-      const count = specs.length
-      const angle = count <= 1 ? -Math.PI / 2 : -Math.PI / 2 + (Math.PI * 2 * index) / count
-      const length = 70 + Math.min(52, Math.abs(item.delta) * 0.7)
-      const x1 = 250 + Math.cos(angle) * 48
-      const y1 = 250 + Math.sin(angle) * 48
-      const x2 = 250 + Math.cos(angle) * length
-      const y2 = 250 + Math.sin(angle) * length
-      return { ...item, x1, y1, x2, y2 }
-    })
-  }, [baselineMedians, receipt, thread])
-
-  const currentScore = receipt.radiusScore
   const deltaVsBaseline = currentScore == null || baselineScore === 0
     ? null
     : ((currentScore - baselineScore) / baselineScore) * 100
-  const fingerprintVisible = showFingerprint && signature.length > 0
+
+  const fingerprint = useMemo(() => metricSpecs[thread].flatMap((spec) => {
+    const raw = receipt[spec.key]
+    const value = typeof raw === 'number' ? raw : null
+    const reference = baselineMedians[String(spec.key)] ?? null
+    if (value == null || reference == null || reference === 0) return []
+    const delta = ((value - reference) / Math.abs(reference)) * 100
+    return [{ key: String(spec.key), label: compactMetricLabel(spec.label), delta }]
+  }).slice(0, 5), [baselineMedians, receipt, thread])
+
+  const deltaCopy = deltaVsBaseline == null
+    ? 'No comparable radius score'
+    : Math.abs(deltaVsBaseline) < 2
+      ? 'Near the Before reference'
+      : `${Math.abs(Math.round(deltaVsBaseline))}% ${deltaVsBaseline < 0 ? 'smaller' : 'larger'} than Before`
 
   return (
-    <motion.figure layoutId="living-radius" className="radius-figure radius-figure-final" aria-labelledby="radius-title radius-caption">
-      <div className="radius-canvas-shell">
-        <svg viewBox="0 0 500 500" role="img" aria-labelledby="radius-title radius-desc">
-          <title id="radius-title">Living radius for {fmtDate(receipt.date)}</title>
-          <desc id="radius-desc">
-            The outer cyan ring shows the Before reference score of {Math.round(baselineScore)} out of 100.
-            The inner chapter ring shows {currentScore == null ? 'no score' : `${Math.round(currentScore)} out of 100`} for {fmtDate(receipt.date)}.
-            The centre marks Home. This is a visual storytelling score rather than a physical distance measurement.
+    <motion.figure layoutId="living-radius" className="radius-v2" aria-labelledby="radius-v2-title radius-v2-caption">
+      <div className="radius-statebar-v2" aria-hidden="true">
+        <span className="reference"><i /> <b>Before</b><strong>{Math.round(baselineScore)}<small>/100</small></strong></span>
+        {!isReference && <span className="current" style={{ '--current': currentColor } as CSSProperties}><i /> <b>{receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter}</b><strong>{currentScore == null ? '—' : Math.round(currentScore)}<small>/100</small></strong></span>}
+      </div>
+
+      <div className="radius-canvas-v2">
+        <svg viewBox="0 0 500 500" role="img" aria-labelledby="radius-v2-title radius-v2-desc">
+          <title id="radius-v2-title">Living radius for {fmtDate(receipt.date)}</title>
+          <desc id="radius-v2-desc">
+            The Before reference score is {Math.round(baselineScore)} out of 100.
+            {isReference
+              ? ' This selected day is in the Before reference chapter, so only the reference ring is shown.'
+              : ` The selected day score is ${currentScore ?? 'unavailable'} out of 100. The current ring is scaled relative to the Before reference.`}
+            This is a visual storytelling score, not physical distance.
           </desc>
-          <defs>
-            <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="8" result="blur" />
-              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-          </defs>
 
-          <g className="radius-grid" aria-hidden="true">
-            {[62, 106, 150, 194].map((r) => <circle key={r} cx="250" cy="250" r={r} />)}
-            <line x1="250" y1="34" x2="250" y2="466" />
-            <line x1="34" y1="250" x2="466" y2="250" />
-            <text x="250" y="24" textAnchor="middle">N</text>
-            <text x="250" y="486" textAnchor="middle">S</text>
-            <text x="18" y="255" textAnchor="middle">W</text>
-            <text x="482" y="255" textAnchor="middle">E</text>
-            <text x="258" y="188">60</text>
-            <text x="258" y="144">80</text>
-            <text x="258" y="100">100</text>
-          </g>
+          <circle cx="250" cy="250" r="208" className="radius-v2-guide outer" />
+          <circle cx="250" cy="250" r="132" className="radius-v2-guide" />
+          <circle cx="250" cy="250" r="82" className="radius-v2-guide" />
+          <line x1="38" y1="250" x2="462" y2="250" className="radius-v2-axis" />
+          <line x1="250" y1="38" x2="250" y2="462" className="radius-v2-axis" />
+          <text x="250" y="30" textAnchor="middle" className="radius-v2-compass">N</text>
+          <text x="470" y="255" textAnchor="middle" className="radius-v2-compass">E</text>
+          <text x="250" y="482" textAnchor="middle" className="radius-v2-compass">S</text>
+          <text x="30" y="255" textAnchor="middle" className="radius-v2-compass">W</text>
 
-          <circle cx="250" cy="250" r={baseline} className="radius-before-fill" />
-          <circle cx="250" cy="250" r={baseline} className="radius-before-ring" filter={`url(#${glowId})`} />
-          <circle cx="250" cy={250 - baseline} r="4" className="radius-before-dot" />
-          <g className="radius-before-label" transform={`translate(250 ${250 - baseline - 14})`}>
-            <text textAnchor="middle" y="-11">{Math.round(baselineScore)} /100</text>
-            <text textAnchor="middle" y="5">BEFORE</text>
-          </g>
-
-          <motion.circle
+          <circle
             cx="250"
             cy="250"
-            initial={{ r: radius }}
-            animate={{ r: radius }}
-            transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 105, damping: 24 }}
-            className="radius-current-fill"
-            style={{ fill: currentColor }}
+            r={baselineRadius}
+            className={`radius-v2-baseline ${isReference ? 'is-reference' : ''}`}
           />
-          <motion.circle
-            cx="250"
-            cy="250"
-            initial={{ r: radius }}
-            animate={{ r: radius }}
-            transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 105, damping: 24 }}
-            fill="transparent"
-            stroke={currentColor}
-            strokeWidth="3"
-            className="radius-current-ring"
-            filter={`url(#${glowId})`}
-          />
-          {currentScore != null && (
-            <g className="radius-current-label" transform={`translate(250 ${Math.max(88, 250 - radius - 14)})`}>
-              <text textAnchor="middle" y="-11">{Math.round(currentScore)} /100</text>
-              <text textAnchor="middle" y="5">{chapter?.name.toUpperCase() ?? 'CURRENT'}</text>
-            </g>
+
+          {!isReference && (
+            <motion.circle
+              cx="250"
+              cy="250"
+              fill="transparent"
+              stroke={currentColor}
+              strokeWidth="3"
+              initial={quiet ? false : { r: baselineRadius, opacity: 0.25 }}
+              animate={{ r: currentRadius, opacity: currentScore == null ? 0.35 : 1 }}
+              transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 20 }}
+              className="radius-v2-current"
+            />
           )}
 
-          {fingerprintVisible && (
-            <g className="signal-signature" aria-hidden="true">
-              {signature.map((item, index) => (
-                <g key={item.key}>
-                  <motion.line
-                    x1={item.x1}
-                    y1={item.y1}
-                    initial={quiet ? false : { x2: item.x1, y2: item.y1 }}
-                    animate={{ x2: item.x2, y2: item.y2 }}
-                    transition={quiet ? { duration: 0 } : { duration: 0.28, delay: index * 0.03 }}
-                    stroke={threadMeta.color}
-                    strokeWidth="1.25"
-                    opacity="0.56"
-                  />
-                  <circle cx={item.x2} cy={item.y2} r="3" fill={threadMeta.color} opacity="0.85" />
-                </g>
-              ))}
-            </g>
+          {!isReference && currentScore != null && (
+            <motion.circle
+              cx="250"
+              cy="250"
+              fill={currentColor}
+              initial={quiet ? false : { r: baselineRadius, opacity: 0 }}
+              animate={{ r: currentRadius, opacity: 0.055 }}
+              transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 20 }}
+            />
           )}
 
-          <circle cx="250" cy="250" r="34" className="home-core-final" />
-          <foreignObject x="226" y="218" width="48" height="48" className="home-icon-foreign">
-            <div className="home-icon-wrap"><Home size={18} aria-hidden="true" /><span>HOME</span></div>
+          <circle cx="250" cy="250" r="42" className="radius-v2-home" />
+          <foreignObject x="218" y="214" width="64" height="74" className="radius-v2-home-object">
+            <div className="radius-v2-home-label">
+              <Home size={22} aria-hidden="true" />
+              <span>HOME</span>
+            </div>
           </foreignObject>
         </svg>
       </div>
 
-      <figcaption id="radius-caption" className="radius-summary-card">
-        <div className="radius-summary-main">
-          <div className="score-side before"><strong>{Math.round(baselineScore)}</strong><span>/100</span><b>Before</b><small>reference median</small></div>
-          <span className="score-arrow" aria-hidden="true">→</span>
-          <div className="score-side current" style={{ '--current': currentColor } as CSSProperties}>
-            <strong>{currentScore == null ? '—' : Math.round(currentScore)}</strong><span>/100</span><b>{chapter?.name ?? 'Current'}</b><small>{fmtDate(receipt.date, false)}</small>
+      <figcaption id="radius-v2-caption" className="radius-summary-v2">
+        {isReference ? (
+          <div className="radius-reference-summary-v2">
+            <p>Reference chapter</p>
+            <strong>{Math.round(baselineScore)}<small>/100</small></strong>
+            <span>This ring is the Before benchmark used throughout the story.</span>
           </div>
-        </div>
-        <div className="radius-summary-delta">
-          <strong>{deltaVsBaseline == null ? '—' : `${Math.abs(Math.round(deltaVsBaseline))}%`}</strong>
-          <div><b>{deltaVsBaseline == null ? 'No comparison' : deltaVsBaseline < 0 ? 'Smaller world' : 'Broader world'}</b><span>{deltaVsBaseline == null ? 'No comparable radius was recorded.' : `${deltaVsBaseline < 0 ? 'narrower' : 'wider'} than the Before reference.`}</span></div>
-        </div>
+        ) : (
+          <>
+            <div className="radius-score-compare-v2">
+              <span><small>Before</small><b>{Math.round(baselineScore)}</b><em>/100</em></span>
+              <i aria-hidden="true">→</i>
+              <span className="current" style={{ '--current': currentColor } as CSSProperties}><small>{receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter}</small><b>{currentScore == null ? '—' : Math.round(currentScore)}</b><em>/100</em></span>
+            </div>
+            <div className="radius-takeaway-v2">
+              <strong>{deltaCopy}</strong>
+              <span>Living-radius score · visual storytelling measure, not physical distance.</span>
+            </div>
+          </>
+        )}
       </figcaption>
 
-      <div className="radius-controls-row">
-        <p className="radius-score-note">Score 0–100 · visual storytelling measure, not kilometres or a clinical metric.</p>
-        <button
-          type="button"
-          className={`fingerprint-toggle ${fingerprintVisible ? 'on' : ''}`}
-          onClick={onToggleFingerprint}
-          aria-pressed={showFingerprint}
-          style={{ '--thread': threadMeta.color } as CSSProperties}
-        >
-          <ScanLine size={15} aria-hidden="true" />
-          {showFingerprint ? 'Hide' : 'Show'} {threadMeta.label.toLowerCase()} fingerprint
+      <section className="fingerprint-v2" aria-label={`${threadMeta.label} evidence differences`}>
+        <button type="button" className="fingerprint-toggle-v2" onClick={onToggleFingerprint} aria-expanded={showFingerprint}>
+          <span><i style={{ background: threadMeta.color }} />{threadMeta.label} differences vs Before</span>
+          {showFingerprint ? <ChevronUp size={17} aria-hidden="true" /> : <ChevronDown size={17} aria-hidden="true" />}
         </button>
-      </div>
-
-      {showFingerprint && signature.length === 0 && (
-        <p className="fingerprint-empty">No comparable {threadMeta.label.toLowerCase()} evidence was recorded on this day.</p>
-      )}
-
-      {fingerprintVisible && (
-        <div className="signature-legend" aria-label={`${threadMeta.label} values compared with the Before median`}>
-          {signature.map((item) => (
-            <span key={item.key}><b>{item.label}</b><em>{Math.abs(Math.round(item.delta))}% {item.delta >= 0 ? 'above' : 'below'} Before</em></span>
-          ))}
-        </div>
-      )}
+        {showFingerprint && (
+          <div className="fingerprint-panel-v2">
+            {fingerprint.length ? fingerprint.map((item) => {
+              const abs = Math.min(100, Math.abs(item.delta))
+              const near = Math.abs(item.delta) < 5
+              return (
+                <div className="fingerprint-row-v2" key={item.key}>
+                  <span>{item.label}</span>
+                  <div className="fingerprint-track-v2" aria-hidden="true"><i style={{ width: `${Math.max(4, abs)}%`, background: threadMeta.color }} /></div>
+                  <b className={near ? 'near' : item.delta > 0 ? 'up' : 'down'}>{near ? '≈ Before' : `${item.delta > 0 ? '↑' : '↓'} ${Math.abs(Math.round(item.delta))}%`}</b>
+                </div>
+              )
+            }) : <p>No comparable {threadMeta.label.toLowerCase()} signals are recorded for this day.</p>}
+            <small>Bars show the magnitude of change. Arrows show whether the recorded value is above or below the Before median.</small>
+          </div>
+        )}
+      </section>
     </motion.figure>
   )
 }

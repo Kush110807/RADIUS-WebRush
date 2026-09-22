@@ -68,10 +68,10 @@ export default function TimeScrubber({
     <section className="scrubber" aria-label="Timeline control">
       <div className="scrubber-top">
         <span>{fmtDate(current.date)}</span>
-        <span>{index + 1} / {records.length} recorded days</span>
+        <span>Day {index + 1} of {records.length}</span>
       </div>
 
-      <div className={`range-wrap ${active ? 'is-active' : ''}`}>
+      <div className={`range-wrap ${active ? 'is-active' : ''} ${pct < 4 ? 'bubble-start' : pct > 96 ? 'bubble-end' : ''}`}>
         <div
           className="scrub-bubble"
           aria-hidden="true"
