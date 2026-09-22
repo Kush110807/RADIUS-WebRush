@@ -575,11 +575,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .landing-axis-v2 { position:absolute; background:rgba(75,48,52,.075); pointer-events:none; }
 .landing-axis-v2.horizontal { left:5%; right:5%; top:50%; height:1px; }
 .landing-axis-v2.vertical { top:5%; bottom:5%; left:50%; width:1px; }
-.landing-compass-v2 { position:absolute; color:#7f858c; font:700 .68rem/1 ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.08em; z-index:5; }
-.landing-compass-v2.n { top:1.1%; left:50%; transform:translateX(-50%); }
-.landing-compass-v2.s { bottom:1.1%; left:50%; transform:translateX(-50%); }
-.landing-compass-v2.e { right:1.1%; top:50%; transform:translateY(-50%); }
-.landing-compass-v2.w { left:1.1%; top:50%; transform:translateY(-50%); }
 .landing-before-ring-v2, .landing-collapse-ring-v2 { position:absolute; aspect-ratio:1/1; border-radius:50%; display:grid; place-items:center; }
 .landing-before-ring-v2 { width:72%; border:2px solid var(--cyan); background:radial-gradient(circle,rgba(180,136,80,.045),transparent 68%); box-shadow:0 0 32px rgba(180,136,80,.08); }
 .landing-collapse-ring-v2 { border:2px solid var(--coral); background:radial-gradient(circle,rgba(184,95,104,.075),rgba(184,95,104,.015) 67%,transparent 70%); box-shadow:0 0 28px rgba(184,95,104,.08); }
@@ -630,7 +625,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .radius-v2-guide { fill:none; stroke:rgba(75,48,52,.07); stroke-width:1; }
 .radius-v2-guide.outer { stroke:rgba(75,48,52,.08); stroke-dasharray:4 8; }
 .radius-v2-axis { stroke:rgba(75,48,52,.055); stroke-width:1; stroke-dasharray:3 8; }
-.radius-v2-compass { fill:#806d6a; font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:1.5px; }
 .radius-v2-baseline { fill:none; stroke:var(--cyan); stroke-width:1.5; stroke-dasharray:4 6; opacity:.55; }
 .radius-v2-baseline.is-reference { stroke-width:2.6; stroke-dasharray:none; opacity:1; filter:drop-shadow(0 0 8px rgba(180,136,80,.12)); }
 .radius-v2-current { filter:none; }
@@ -801,7 +795,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .landing-radius-guides-v2 i:nth-child(2) { border-color:rgba(75,48,52,.075); }
 .landing-radius-guides-v2 i:nth-child(3) { border-color:rgba(75,48,52,.09); }
 .landing-axis-v2 { background:rgba(75,48,52,.085); }
-.landing-compass-v2 { color:#8a7470; }
 .landing-before-ring-v2 {
   border-color:var(--cyan);
   background:radial-gradient(circle,rgba(180,136,80,.055),transparent 68%);
@@ -861,7 +854,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .radius-v2-guide { stroke:rgba(75,48,52,.085); }
 .radius-v2-guide.outer { stroke:rgba(75,48,52,.10); }
 .radius-v2-axis { stroke:rgba(75,48,52,.075); }
-.radius-v2-compass { fill:#806d6a; }
 .radius-v2-baseline { stroke:var(--cyan); opacity:.62; }
 .radius-v2-baseline.is-reference { filter:none; }
 .radius-v2-home { fill:#fffaf6; stroke:rgba(75,48,52,.28); }
@@ -1155,4 +1147,145 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     line-height:1;
   }
   .landing-reduction-v2 { margin-top:1px; }
+}
+
+/* =========================================================
+   LANDING ALIGNMENT PATCH V2 — robust at 769–1279px
+   Fixes the metric card overflow/wrapping and makes both
+   ring annotations use one visual alignment system.
+   ========================================================= */
+@media (min-width: 769px) {
+  /* Use the same two-line metric anatomy for both ring labels. */
+  .landing-ring-label-v2.before,
+  .landing-ring-label-v2.first-lockdown {
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-areas:
+      "label label"
+      "value unit";
+    justify-content:center;
+    justify-items:center;
+    align-items:end;
+    column-gap:5px;
+    row-gap:3px;
+    white-space:nowrap;
+    min-width:max-content;
+  }
+  .landing-ring-label-v2.before small,
+  .landing-ring-label-v2.first-lockdown small {
+    grid-area:label;
+    justify-self:center;
+  }
+  .landing-ring-label-v2.before b,
+  .landing-ring-label-v2.first-lockdown b {
+    grid-area:value;
+    font-size:clamp(2.45rem,3.25vw,3.45rem);
+    line-height:.88;
+  }
+  .landing-ring-label-v2.before em,
+  .landing-ring-label-v2.first-lockdown em {
+    grid-area:unit;
+    align-self:end;
+    padding-bottom:3px;
+  }
+  .landing-ring-label-v2.before {
+    transform:translate(-50%,-4%);
+  }
+  .landing-ring-label-v2.first-lockdown {
+    transform:translate(-50%,calc(-100% - 9px));
+    padding:7px 13px 8px;
+    border-radius:16px;
+  }
+
+  /* The card must fit its real 520–570px width without overflow. */
+  .landing-insight-v2 {
+    grid-template-columns:minmax(210px,1fr) max-content;
+    grid-template-areas:
+      "headline compare"
+      "reduction reduction";
+    align-items:center;
+    column-gap:20px;
+    row-gap:14px;
+    padding:20px 24px;
+  }
+  .landing-insight-v2 > p {
+    grid-area:headline;
+    min-width:0;
+    padding-right:0;
+    white-space:nowrap;
+    font-size:clamp(1.72rem,2vw,2.15rem);
+    line-height:.98;
+  }
+  .landing-compare-v2 {
+    grid-area:compare;
+    width:max-content;
+    display:flex;
+    align-items:flex-end;
+    justify-content:flex-end;
+    gap:11px;
+  }
+  .landing-compare-v2 > span {
+    width:auto;
+    min-width:76px;
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-areas:
+      "label label"
+      "value unit";
+    justify-content:start;
+    align-items:end;
+    column-gap:4px;
+    row-gap:2px;
+  }
+  .landing-compare-v2 > span small { grid-area:label; }
+  .landing-compare-v2 > span b {
+    grid-area:value;
+    font-size:clamp(1.8rem,2.25vw,2.2rem);
+    line-height:.9;
+  }
+  .landing-compare-v2 > span em {
+    grid-area:unit;
+    align-self:end;
+    padding-bottom:3px;
+  }
+  .landing-compare-v2 > span:first-child,
+  .landing-compare-v2 > span:last-child {
+    justify-self:auto;
+  }
+  .landing-compare-v2 > i {
+    align-self:flex-end;
+    margin:0 1px 5px;
+    line-height:1;
+  }
+  .landing-reduction-v2 {
+    grid-area:reduction;
+    margin-top:0;
+  }
+}
+
+/* Narrow tablet / phone: consciously stack the card instead of compressing it. */
+@media (max-width: 768px) {
+  .landing-insight-v2 {
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "headline"
+      "compare"
+      "reduction";
+    gap:13px;
+  }
+  .landing-insight-v2 > p {
+    grid-area:headline;
+    white-space:normal;
+  }
+  .landing-compare-v2 {
+    grid-area:compare;
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(82px,1fr) 24px minmax(106px,1fr);
+    align-items:end;
+    gap:8px;
+  }
+  .landing-compare-v2 > span:last-child { justify-self:end; }
+  .landing-reduction-v2 { grid-area:reduction; }
 }

@@ -104,10 +104,6 @@ function LivingRadius({
           <circle cx="250" cy="250" r="82" className="radius-v2-guide" />
           <line x1="38" y1="250" x2="462" y2="250" className="radius-v2-axis" />
           <line x1="250" y1="38" x2="250" y2="462" className="radius-v2-axis" />
-          <text x="250" y="30" textAnchor="middle" className="radius-v2-compass">N</text>
-          <text x="470" y="255" textAnchor="middle" className="radius-v2-compass">E</text>
-          <text x="250" y="482" textAnchor="middle" className="radius-v2-compass">S</text>
-          <text x="30" y="255" textAnchor="middle" className="radius-v2-compass">W</text>
 
           {currentScore != null && (
             <motion.circle

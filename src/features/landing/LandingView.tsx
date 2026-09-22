@@ -51,7 +51,6 @@ export default function LandingView({
       >
         <div className="landing-radius-v2" aria-hidden="true">
           <div className="landing-radius-guides-v2"><i /><i /><i /></div>
-          <span className="landing-compass-v2 n">N</span><span className="landing-compass-v2 e">E</span><span className="landing-compass-v2 s">S</span><span className="landing-compass-v2 w">W</span>
           <div className="landing-axis-v2 horizontal" /><div className="landing-axis-v2 vertical" />
           <div className="landing-before-ring-v2" />
           <span className="landing-ring-label-v2 before"><small>Before</small><b>{Math.round(beforeRadius)}</b><em>/100</em></span>
