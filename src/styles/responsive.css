@@ -702,3 +702,131 @@ svg, img { max-width:100%; }
     bottom:calc(100% + 2px);
   }
 }
+
+/* Mobile timeline label repair — preserve the event marker without year collisions. */
+@media (max-width: 560px) {
+  .story-v2 .story-nav-stack .year-labels {
+    height:14px;
+    margin-top:3px;
+  }
+
+  .story-v2 .story-nav-stack .year-labels span {
+    display:none;
+  }
+
+  .story-v2 .story-nav-stack .year-labels span:first-child,
+  .story-v2 .story-nav-stack .year-labels span:last-child {
+    display:block;
+  }
+
+  .story-v2 .story-nav-stack .year-labels span:first-child {
+    left:0 !important;
+    transform:none;
+  }
+
+  .story-v2 .story-nav-stack .year-labels span:last-child {
+    left:auto !important;
+    right:0;
+    transform:none;
+  }
+
+  .story-v2 .story-nav-stack .disruption b {
+    top:12px;
+    font-size:.59rem !important;
+    line-height:1;
+  }
+}
+
+/* =========================================================
+   TARGETED FINAL-POLISH OVERRIDES
+   Keep the warm editorial system readable and the timeline
+   comfortable without changing the established composition.
+   ========================================================= */
+@media (min-width: 1500px) {
+  .story-grid-v2 {
+    grid-template-columns:minmax(310px,330px) minmax(520px,1fr) minmax(370px,420px);
+    column-gap:24px;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1499px) {
+  .story-grid-v2 {
+    grid-template-columns:minmax(285px,305px) minmax(460px,1fr) minmax(330px,380px);
+    column-gap:20px;
+  }
+}
+
+@media (min-width: 1051px) and (max-width: 1279px) {
+  .story-grid-v2 {
+    grid-template-columns:minmax(225px,245px) minmax(400px,1fr) minmax(290px,320px);
+    gap:16px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* The score definition is critical meaning, not tertiary metadata. */
+  .score-definition-v2 {
+    display:flex !important;
+    width:100%;
+    max-width:none;
+    align-items:flex-start;
+    margin-top:4px;
+  }
+  .score-definition-v2 b { font-size:.78rem !important; }
+  .score-definition-v2 small { font-size:.72rem !important; text-align:left; }
+
+  .story-v2 .chapter-copy small {
+    display:block;
+    font-size:.78rem;
+    line-height:1.3;
+    color:#756563;
+  }
+  .story-v2 .chapter-copy strong { font-size:.82rem; }
+  .story-v2 .scrubber-top { font-size:.79rem; }
+  .story-v2 .scrubber-top span:last-child { font-size:.75rem; }
+  .story-v2 .year-labels { font-size:.73rem; color:#756563; }
+  .scrubber-help { font-size:.76rem; color:#756563; }
+}
+
+@media (max-width: 560px) {
+  .visual-heading-v2 {
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+    align-items:start;
+  }
+  .score-definition-v2 { padding:9px 10px; }
+  .story-v2 .chapter-button { min-height:68px; }
+  .story-v2 .chapter-copy strong { font-size:.8rem; }
+  .story-v2 .chapter-copy small { font-size:.76rem; }
+  .story-v2 .story-nav-stack .scrubber {
+    width:100%;
+    padding:12px 12px 10px;
+  }
+  .story-v2 .story-nav-stack .scrubber-top {
+    font-size:.78rem;
+    line-height:1.3;
+  }
+  .story-v2 .story-nav-stack .scrubber-top span:last-child { font-size:.74rem; }
+  .scrubber-help { font-size:.74rem; }
+
+  .archive-card-head { font-size:.8rem; }
+  .archive-metrics small { font-size:.77rem; }
+  .methodology-wrap section > p { font-size:.98rem; }
+  .methodology-wrap ul { font-size:.94rem; }
+}
+
+@media (max-width: 375px) {
+  .story-v2 .chapter-copy strong { font-size:.78rem; }
+  .story-v2 .chapter-copy small { font-size:.74rem; }
+  .score-definition-v2 b { font-size:.76rem !important; }
+  .score-definition-v2 small { font-size:.7rem !important; }
+  .scrubber-help { font-size:.72rem; }
+}
+
+@media (max-width: 320px) {
+  .story-v2 .chapter-copy strong { font-size:.76rem; }
+  .story-v2 .chapter-copy small { font-size:.72rem; }
+  .story-v2 .story-nav-stack .scrubber-top { font-size:.76rem; }
+  .story-v2 .story-nav-stack .scrubber-top span:last-child { font-size:.72rem; }
+}

@@ -1369,3 +1369,262 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 /* Once the timeline lives in the story rail, the footer becomes a quiet secondary strip. */
 .story-v2 .story-footer { margin-top:8px; }
+
+/* =========================================================
+   FINAL USABILITY POLISH — performance, clarity, timeline,
+   secondary text readability and reduced-motion behaviour.
+   ========================================================= */
+.view-frame { min-height:calc(100svh - 68px); }
+
+.landing-score-explainer {
+  margin:10px auto 0;
+  max-width:560px;
+  color:#5e494b;
+  font-size:.82rem;
+  line-height:1.5;
+  text-align:center;
+}
+.landing-score-explainer strong { color:#4b3034; font-weight:750; }
+
+.score-definition-v2 {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:3px;
+  max-width:245px;
+  padding:8px 11px;
+  background:rgba(255,250,246,.72);
+  border:1px solid rgba(75,48,52,.14)!important;
+  border-radius:12px;
+  color:#5e494b!important;
+  text-transform:none!important;
+  letter-spacing:0!important;
+  line-height:1.25;
+}
+.score-definition-v2 b {
+  color:#4b3034;
+  font-size:.76rem;
+  letter-spacing:.015em;
+}
+.score-definition-v2 small {
+  color:#756563;
+  font-size:.68rem;
+  line-height:1.35;
+  text-align:right;
+}
+
+/* Secondary information remains quiet, but meaningful text now meets body-text contrast. */
+.chapter-copy small,
+.chapter-copy > span,
+.scrubber-top,
+.year-labels,
+.radius-score-compare-v2 small,
+.radius-score-compare-v2 em,
+.radius-takeaway-v2 span,
+.observation-snapshot-head-v3 > small,
+.observation-stat-v3 > span,
+.observation-stat-v3 > small,
+.panel-intro-v2 > p:last-child,
+.signal-row-v2 > div small,
+.signal-delta-v2,
+.archive-card-head,
+.archive-metrics small,
+.archive-radius-glyph small,
+.drawer-chapter p,
+.drawer-score-note,
+.evidence-table small,
+.evidence-table em,
+.method-note p,
+.context-note p,
+.methodology-wrap section > p,
+.methodology-wrap ul,
+.archive-header > div > p:last-child,
+.archive-more p {
+  color:#756563;
+}
+.chapter-copy small { font-size:.78rem; }
+.chapter-copy > span { font-size:.82rem; }
+.archive-card-head { font-size:.78rem; }
+.archive-metrics small { font-size:.73rem; }
+.archive-metrics strong { font-size:.82rem; }
+.receipt-head { font-size:.75rem; color:#756563; }
+.receipt-main strong { font-size:.82rem; }
+.receipt p { font-size:.79rem; }
+.receipt > small, .receipt footer { color:#756563; font-size:.75rem; }
+.methodology-wrap section > p { font-size:.98rem; line-height:1.72; }
+.methodology-wrap ul { font-size:.94rem; line-height:1.68; }
+.drawer-score-note { font-size:.78rem; line-height:1.5; }
+.evidence-table span { font-size:.83rem; }
+.evidence-table small { font-size:.76rem; }
+.evidence-table em { font-size:.77rem; }
+.observation-hero-v2 > p:last-child { font-size:.9rem; }
+.observation-section-v2 > p:last-child,
+.context-card-v2 p:last-child { font-size:.84rem; }
+.panel-intro-v2 > p:last-child { font-size:.81rem; }
+.signal-row-v2 > div strong { font-size:.8rem; }
+.signal-row-v2 > div small { font-size:.69rem; }
+.signal-delta-v2 { font-size:.7rem; }
+
+/* Timeline: larger interaction target, clearer metadata and nearby-day controls. */
+.story-nav-stack .scrubber {
+  padding:14px 14px 12px;
+}
+.story-nav-stack .scrubber-top {
+  margin-bottom:9px;
+  color:#5e494b;
+  font-size:.71rem;
+}
+.story-nav-stack .scrubber-top strong {
+  color:#4b3034;
+  font-weight:750;
+}
+.story-nav-stack .scrubber-top span:last-child {
+  color:#756563;
+  font-size:.67rem;
+}
+.story-nav-stack .range-wrap,
+.range-wrap { height:48px; }
+.range-track { height:3px; }
+.range-wrap input[type="range"] {
+  height:44px;
+  cursor:pointer;
+}
+.range-wrap input[type="range"]::-webkit-slider-runnable-track { height:3px; }
+.range-wrap input[type="range"]::-webkit-slider-thumb {
+  width:24px;
+  height:24px;
+  margin-top:-10.5px;
+  border-width:6px;
+  transition:transform .14s ease, box-shadow .14s ease;
+}
+.range-wrap input[type="range"]::-moz-range-track { height:3px; }
+.range-wrap input[type="range"]::-moz-range-thumb {
+  width:24px;
+  height:24px;
+  border-width:6px;
+  transition:transform .14s ease, box-shadow .14s ease;
+}
+.range-wrap input[type="range"]:hover::-webkit-slider-thumb,
+.range-wrap.is-active input[type="range"]::-webkit-slider-thumb {
+  transform:scale(1.06);
+  box-shadow:0 0 0 4px rgba(110,57,72,.12),0 0 0 1px rgba(75,48,52,.42);
+}
+.range-wrap input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow:0 0 0 4px rgba(110,57,72,.18),0 0 0 2px #6e3948;
+}
+.range-wrap input[type="range"]:hover::-moz-range-thumb,
+.range-wrap.is-active input[type="range"]::-moz-range-thumb {
+  transform:scale(1.06);
+  box-shadow:0 0 0 4px rgba(110,57,72,.12),0 0 0 1px rgba(75,48,52,.42);
+}
+.story-nav-stack .range-wrap { height:48px; }
+.story-nav-stack .disruption b { top:16px; }
+.story-nav-stack .year-labels { color:#756563; font-size:.67rem; }
+.scrubber-help {
+  margin-top:7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  color:#756563;
+  font-size:.68rem;
+  line-height:1.3;
+}
+.scrubber-nudges { display:flex; gap:4px; }
+.scrubber-nudges button {
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(75,48,52,.15);
+  border-radius:10px;
+  background:rgba(255,250,246,.78);
+  color:#5e494b;
+  cursor:pointer;
+  transition:background .14s ease,border-color .14s ease,color .14s ease;
+}
+.scrubber-nudges button:hover:not(:disabled),
+.scrubber-nudges button:focus-visible {
+  background:#fffaf6;
+  border-color:rgba(110,57,72,.35);
+  color:#4b3034;
+}
+.scrubber-nudges button:disabled { opacity:.36; cursor:default; }
+
+/* Give the desktop rail enough room for a 1,227-day interaction without dominating the page. */
+@media (min-width:1280px) {
+  .story-grid-v2 { grid-template-columns:minmax(270px,292px) minmax(500px,1fr) minmax(340px,390px); }
+}
+@media (min-width:1051px) and (max-width:1279px) {
+  .story-grid-v2 { grid-template-columns:minmax(245px,265px) minmax(430px,1fr) minmax(300px,330px); gap:20px; }
+}
+
+@media (max-width:768px) {
+  .score-definition-v2 {
+    display:flex;
+    align-items:flex-start;
+    max-width:none;
+    width:100%;
+    margin-top:2px;
+  }
+  .score-definition-v2 small { text-align:left; }
+  .chapter-copy small { font-size:.81rem; }
+  .chapter-copy > span { font-size:.83rem; }
+  .methodology-wrap section > p { font-size:.96rem; }
+  .methodology-wrap ul { font-size:.92rem; }
+  .archive-card-head { font-size:.8rem; }
+  .archive-metrics small { font-size:.77rem; }
+  .receipt-head { font-size:.78rem; }
+  .receipt p { font-size:.81rem; }
+  .receipt > small, .receipt footer { font-size:.78rem; }
+  .story-v2 .story-nav-stack .scrubber-top { font-size:.78rem; }
+  .story-v2 .story-nav-stack .scrubber-top span:last-child { font-size:.74rem; }
+  .scrubber-help { font-size:.74rem; }
+}
+
+@media (max-width:560px) {
+  .story-v2 .story-nav-stack .scrubber { padding:12px 12px 10px; }
+  .story-v2 .story-nav-stack .scrubber-top { gap:8px; }
+  .scrubber-help { align-items:center; }
+  .landing-score-explainer { font-size:.79rem; padding-inline:6px; }
+  .methodology-wrap section > p { font-size:.98rem; }
+  .archive-card-head { font-size:.79rem; }
+}
+
+@media (max-width:375px) {
+  .scrubber-help { font-size:.72rem; }
+  .scrubber-nudges button { width:44px; height:44px; }
+  .score-definition-v2 b { font-size:.73rem; }
+  .score-definition-v2 small { font-size:.66rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto; }
+  .view-frame,
+  .system-orbit,
+  .primary-cta,
+  .chapter-button,
+  .archive-card,
+  .archive-radius-glyph i,
+  .thread-card-v2,
+  .scrub-bubble,
+  .scrubber-nudges button,
+  .range-wrap input[type="range"]::-webkit-slider-thumb,
+  .range-wrap input[type="range"]::-moz-range-thumb {
+    animation:none!important;
+    transition:none!important;
+  }
+}
+
+/* Final warm-semantic states: directional analysis stays legible without neon accents. */
+.signal-delta-v2.up,
+.fingerprint-row-v2 > b.up { color:#526047; }
+.signal-delta-v2.down,
+.fingerprint-row-v2 > b.down { color:#8B5961; }
+.view-frame { position:relative; }
+
+/* WCAG-AA warm neutrals for meaningful secondary copy on both ivory and blush surfaces. */
+:root {
+  --muted:#6A5756;
+  --subtle:#705E5D;
+}

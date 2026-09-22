@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, Home } from 'lucide-react'
 import type { LifeReceipt, ThreadId } from '../types/receipts'
 import { chapterColors } from '../data/chapters'
 import { metricSpecs, threads } from '../lib/metrics'
-import { fmtDate } from '../lib/formatters'
+import { comparisonFromPct, comparisonText, fmtDate } from '../lib/formatters'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
 const clamp = (min: number, max: number, value: number) => Math.max(min, Math.min(max, value))
@@ -62,9 +62,7 @@ function LivingRadius({
   const currentLabel = isReference ? 'Selected day' : receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter
   const threadMeta = threads.find((item) => item.id === thread)!
 
-  const deltaVsBaseline = currentScore == null || baselineScore === 0
-    ? null
-    : ((currentScore - baselineScore) / baselineScore) * 100
+  const deltaCopy = comparisonText(currentScore, baselineScore, 'Before')
 
   const fingerprint = useMemo(() => metricSpecs[thread].flatMap((spec) => {
     const raw = receipt[spec.key]
@@ -74,12 +72,6 @@ function LivingRadius({
     const delta = ((value - reference) / Math.abs(reference)) * 100
     return [{ key: String(spec.key), label: compactMetricLabel(spec.label), delta }]
   }).slice(0, 5), [baselineMedians, receipt, thread])
-
-  const deltaCopy = deltaVsBaseline == null
-    ? 'No comparable radius score'
-    : Math.abs(deltaVsBaseline) < 2
-      ? 'Near the Before reference'
-      : `${Math.abs(Math.round(deltaVsBaseline))}% ${deltaVsBaseline < 0 ? 'smaller' : 'larger'} than ${isReference ? 'Before median' : 'Before'}`
 
   return (
     <motion.figure layoutId="living-radius" className="radius-v2" aria-labelledby="radius-v2-title radius-v2-caption">
@@ -155,7 +147,7 @@ function LivingRadius({
         </div>
         <div className="radius-takeaway-v2">
           <strong>{deltaCopy}</strong>
-          <span>{isReference ? 'Selected Before-day vs the chapter median.' : 'Living-radius score · visual storytelling measure, not physical distance.'}</span>
+          <span>{isReference ? 'Selected Before-day compared with the Before chapter median.' : 'Current day compared with the Before chapter median.'}</span>
         </div>
       </figcaption>
 
@@ -168,12 +160,12 @@ function LivingRadius({
           <div className="fingerprint-panel-v2">
             {fingerprint.length ? fingerprint.map((item) => {
               const abs = Math.min(100, Math.abs(item.delta))
-              const near = Math.abs(item.delta) < 5
+              const near = Math.abs(item.delta) < 0.5
               return (
                 <div className="fingerprint-row-v2" key={item.key}>
                   <span>{item.label}</span>
                   <div className="fingerprint-track-v2" aria-hidden="true"><i style={{ width: `${Math.max(4, abs)}%`, background: threadMeta.color }} /></div>
-                  <b className={near ? 'near' : item.delta > 0 ? 'up' : 'down'}>{near ? '≈ Before' : `${item.delta > 0 ? '↑' : '↓'} ${Math.abs(Math.round(item.delta))}%`}</b>
+                  <b className={near ? 'near' : item.delta > 0 ? 'up' : 'down'}>{comparisonFromPct(item.delta, 'Before')}</b>
                 </div>
               )
             }) : <p>No comparable {threadMeta.label.toLowerCase()} signals are recorded for this day.</p>}

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { X } from 'lucide-react'
 import type { DataPayload, LifeReceipt, ThreadId } from '../types/receipts'
 import { metricSpecs, threads } from '../lib/metrics'
-import { fmtDate, pctText, signedPct } from '../lib/formatters'
+import { comparisonText, fmtDate } from '../lib/formatters'
 import { chapters, chapterColors } from '../data/chapters'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 
@@ -136,7 +136,7 @@ export default function EvidenceDrawer({
                         {metric.qualification && <small>{metric.qualification}</small>}
                       </div>
                       <strong>{value == null ? 'No record' : `${value.toFixed(metric.digits ?? 0)}${metric.unit}`}</strong>
-                      <em>{pctText(signedPct(value, chapterMedian))} vs chapter median</em>
+                      <em>{comparisonText(value, chapterMedian, 'chapter')}</em>
                     </div>
                   )
                 })}

@@ -22,19 +22,24 @@ export function useHashView() {
   useEffect(() => {
     const sync = () => setView(parseHash())
     window.addEventListener('hashchange', sync)
-    return () => window.removeEventListener('hashchange', sync)
+    window.addEventListener('popstate', sync)
+    return () => {
+      window.removeEventListener('hashchange', sync)
+      window.removeEventListener('popstate', sync)
+    }
   }, [])
 
   const navigate = useCallback((next: AppView) => {
-    const hash = hashForView(next)
-    if (hash) {
-      if (window.location.hash !== hash) window.location.hash = hash
-    } else {
-      history.pushState(null, '', `${window.location.pathname}${window.location.search}`)
-      setView('landing')
+    if (next === view) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
+      return
     }
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })
-  }, [reduceMotion])
+    const hash = hashForView(next)
+    const nextUrl = `${window.location.pathname}${window.location.search}${hash}`
+    history.pushState(null, '', nextUrl)
+    setView(next)
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [view])
 
   return { view, navigate, reduceMotion }
 }

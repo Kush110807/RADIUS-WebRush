@@ -1,36 +1,31 @@
 import { motion } from 'motion/react'
 import { ArrowRight, Home } from 'lucide-react'
-import type { DataPayload } from '../../types/receipts'
+import type { LandingSummary } from '../../data/landingSummary'
 
 export default function LandingView({
-  data,
+  summary,
   reduceMotion,
+  onPrepare,
   onEnter,
 }: {
-  data: DataPayload
+  summary: LandingSummary
   reduceMotion: boolean
+  onPrepare?: () => void
   onEnter: () => void
 }) {
-  const beforeRadius = data.chapterMedians.before.radiusScore ?? data.normalisation.baselineRadiusScore
-  const collapseRadius = data.chapterMedians.collapse.radiusScore ?? beforeRadius
+  const beforeRadius = summary.beforeRadius
+  const collapseRadius = summary.firstLockdownRadius
   const collapseRatio = Math.max(0.25, Math.min(0.88, collapseRadius / Math.max(1, beforeRadius)))
   const reduction = Math.max(0, Math.round((1 - collapseRadius / Math.max(1, beforeRadius)) * 100))
 
   return (
-    <motion.main
-      id="main-content"
-      className="landing landing-v2"
-      key="landing"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.985 }}
-    >
+    <main id="main-content" className="landing landing-v2">
       <section className="hero-copy hero-copy-v2" aria-labelledby="hero-title">
-        <p className="eyebrow">Your life, in receipts · Anonymous 37</p>
+        <p className="eyebrow">Your life, in receipts · {summary.participant}</p>
         <h1 id="hero-title">How far can<br />a life <em>shrink?</em></h1>
         <p className="hero-tagline">The year a life folded inward.</p>
-        <p className="hero-support">Four years. 1,227 recorded days. One anonymous student. Thousands of digital traces turned into a navigable story.</p>
-        <button className="primary-cta" type="button" onClick={onEnter}>
+        <p className="hero-support">Four years. {summary.days.toLocaleString()} recorded days. One anonymous student. Thousands of digital traces turned into a navigable story.</p>
+        <button className="primary-cta" type="button" onPointerEnter={onPrepare} onFocus={onPrepare} onTouchStart={onPrepare} onClick={onEnter}>
           Enter the story <ArrowRight aria-hidden="true" />
         </button>
         <div className="radius-key-wrap radius-key-v2-wrap">
@@ -45,7 +40,6 @@ export default function LandingView({
       </section>
 
       <motion.section
-        layoutId={reduceMotion ? undefined : 'radius-frame'}
         className="hero-visual hero-visual-v2"
         aria-label={`The median living-radius score contracts from ${Math.round(beforeRadius)} before March 2020 to ${Math.round(collapseRadius)} during the first lockdown period, a ${reduction} percent reduction.`}
       >
@@ -74,12 +68,13 @@ export default function LandingView({
           </div>
           <div className="landing-reduction-v2"><strong>{reduction}%</strong><span><b>smaller than Before</b><small>median living-radius score</small></span></div>
         </div>
+        <p className="landing-score-explainer"><strong>Living-radius score (0–100)</strong> — a visual storytelling measure, not physical distance.</p>
       </motion.section>
 
       <footer className="landing-footer">
         <span>Observed change, not causal diagnosis.</span>
-        <span>Living-radius score 0–100 · visual storytelling measure · not physical distance</span>
+        <span>One participant · recorded signals · four chapters</span>
       </footer>
-    </motion.main>
+    </main>
   )
 }

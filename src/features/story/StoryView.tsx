@@ -24,7 +24,8 @@ export default function StoryView({
   reduceMotion: boolean
   onNavigate: (view: AppView) => void
 }) {
-  const [index, setIndex] = useState(() => Math.max(0, chapterAnchors(data.records).collapse))
+  const chapterStart = useMemo(() => chapterAnchors(data.records), [data.records])
+  const [index, setIndex] = useState(() => Math.max(0, chapterStart.collapse))
   const [thread, setThread] = useState<ThreadId>('movement')
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [announcement, setAnnouncement] = useState('')
@@ -33,7 +34,6 @@ export default function StoryView({
   const scrubTimer = useRef<number | null>(null)
   const { current, previous } = useTimeline(data.records, index)
 
-  const chapterStart = useMemo(() => chapterAnchors(data.records), [data.records])
   const evidenceCounts = useMemo(() => {
     const ids = Object.keys(metricSpecs) as ThreadId[]
     return Object.fromEntries(ids.map((id) => {
@@ -68,20 +68,20 @@ export default function StoryView({
   const chapter = chapters.find((item) => item.id === current.chapter)!
 
   return (
-    <motion.main id="main-content" className={`story story-v2 chapter-${current.chapter}`} key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+    <main id="main-content" className={`story story-v2 chapter-${current.chapter}`}>
       <div className="story-grid story-grid-v2">
         <aside className="story-nav-stack" aria-label="Story navigation and timeline">
           <ChapterNavigator active={current.chapter} onSelect={selectChapter} />
           <TimeScrubber records={data.records} index={index} onChange={handleScrub} />
         </aside>
-        <motion.section layoutId={reduceMotion ? undefined : 'radius-frame'} className="visual-stage visual-stage-v2" aria-labelledby="story-date">
+        <motion.section className="visual-stage visual-stage-v2" aria-labelledby="story-date">
           <div className="visual-heading visual-heading-v2">
             <div>
               <p className="eyebrow">Living radius · {chapter.number}</p>
               <h1 id="story-date">{chapter.name}</h1>
               <p>{fmtDate(current.date)} · Drag through time to see the recorded world expand and contract.</p>
             </div>
-            <span className="score-definition-v2">0–100 storytelling score</span>
+            <span className="score-definition-v2"><b>Living-radius score (0–100)</b><small>Visual storytelling measure · not physical distance</small></span>
           </div>
           <LivingRadius
             receipt={current}
@@ -104,6 +104,6 @@ export default function StoryView({
       </nav>
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
       <EvidenceDrawer open={evidenceOpen} onClose={() => setEvidenceOpen(false)} receipt={current} thread={thread} data={data} />
-    </motion.main>
+    </main>
   )
 }

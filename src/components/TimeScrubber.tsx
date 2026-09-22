@@ -1,4 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { LifeReceipt } from '../types/receipts'
 import { chapterColors } from '../data/chapters'
 import { fmtDate } from '../lib/formatters'
@@ -64,10 +65,12 @@ export default function TimeScrubber({
     }
   }, [records])
 
+  const nudge = (amount: number) => onChange(Math.max(0, Math.min(records.length - 1, index + amount)))
+
   return (
     <section className="scrubber" aria-label="Timeline control">
       <div className="scrubber-top">
-        <span>{fmtDate(current.date)}</span>
+        <strong>{fmtDate(current.date)}</strong>
         <span>Day {index + 1} of {records.length}</span>
       </div>
 
@@ -121,13 +124,20 @@ export default function TimeScrubber({
           onPointerUp={() => setActive(false)}
           onPointerCancel={() => setActive(false)}
         />
-        <span className="sr-only" id="timeline-help">Use arrow keys for nearby recorded days. Home and End jump to the first and last record.</span>
       </div>
 
       <div className="year-labels" aria-hidden="true">
         {yearLabels.map((year) => (
           <span key={year.label} style={{ left: `${year.left}%` }}>{year.label}</span>
         ))}
+      </div>
+
+      <div className="scrubber-help" id="timeline-help">
+        <span>Drag or use ← → keys</span>
+        <span className="scrubber-nudges" aria-label="Move one recorded day">
+          <button type="button" onClick={() => nudge(-1)} disabled={index === 0} aria-label="Previous recorded day"><ChevronLeft size={16} aria-hidden="true" /></button>
+          <button type="button" onClick={() => nudge(1)} disabled={index === records.length - 1} aria-label="Next recorded day"><ChevronRight size={16} aria-hidden="true" /></button>
+        </span>
       </div>
     </section>
   )

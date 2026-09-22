@@ -23,6 +23,8 @@ jobs:
       - run: npm run verify:data
       - run: npm run preflight
       - run: npm run lint
+      - run: npm run final:audit
+      - run: npm run test:formatters
       - run: npm run typecheck
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v3
