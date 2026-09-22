@@ -23,10 +23,10 @@ export default function ThreadSelector({
     <section className="evidence-explorer-v2" aria-labelledby="evidence-explorer-title">
       <div className="evidence-explorer-head-v2">
         <div>
-          <p className="eyebrow">Evidence explorer</p>
-          <h2 id="evidence-explorer-title">Choose a lens</h2>
+          <p className="eyebrow">Story lenses</p>
+          <h2 id="evidence-explorer-title">Choose what to notice</h2>
         </div>
-        <p>Select a lens to change the evidence beside the chart. Counts show days with usable data.</p>
+        <p>Pick a lens to change the evidence beside the radius. Counts show days with usable data.</p>
       </div>
 
       <div className="thread-grid-v2" role="group" aria-label="Evidence threads">

@@ -420,3 +420,26 @@ svg, img { max-width:100%; }
   .story-v2 .scrub-bubble { top:auto; bottom:calc(100% + 2px); }
   .story-v2 .scrubber:has(.range-wrap.is-active) .scrubber-top { visibility:hidden; }
 }
+
+/* Final Warm Minimal responsive polish */
+@media (max-width: 1050px) {
+  .hero-visual-v2 { padding:20px; }
+  .observation-v2 { background:rgba(255,250,246,.9); }
+}
+@media (max-width: 768px) {
+  .hero-visual-v2 { border-radius:22px; }
+  .landing-ring-label-v2.before { top:4.5%; }
+  .landing-ring-label-v2.collapse { top:28%; }
+}
+@media (max-width: 560px) {
+  .hero-visual-v2 { padding:13px; border-radius:18px; }
+  .landing-ring-label-v2.before { top:3%; }
+  .landing-ring-label-v2.collapse { top:26.5%; }
+  .landing-ring-label-v2 b { font-size:1.9rem; }
+  .landing-ring-label-v2 small { font-size:.55rem; }
+}
+@media (max-width: 375px) {
+  .landing-ring-label-v2.before { top:2%; }
+  .landing-ring-label-v2.collapse { top:25.5%; }
+  .landing-ring-label-v2 b { font-size:1.65rem; }
+}

@@ -53,18 +53,16 @@ export default function LandingView({
           <div className="landing-radius-guides-v2"><i /><i /><i /></div>
           <span className="landing-compass-v2 n">N</span><span className="landing-compass-v2 e">E</span><span className="landing-compass-v2 s">S</span><span className="landing-compass-v2 w">W</span>
           <div className="landing-axis-v2 horizontal" /><div className="landing-axis-v2 vertical" />
-          <div className="landing-before-ring-v2">
-            <span className="landing-ring-label-v2 before"><small>Before</small><b>{Math.round(beforeRadius)}</b><em>/100</em></span>
-          </div>
+          <div className="landing-before-ring-v2" />
+          <span className="landing-ring-label-v2 before"><small>Before</small><b>{Math.round(beforeRadius)}</b><em>/100</em></span>
           <motion.div
             className="landing-collapse-ring-v2"
             style={{ width: `${collapseRatio * 72}%`, height: `${collapseRatio * 72}%` }}
             initial={reduceMotion ? false : { scale: 1.5, opacity: 0.15 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 1, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <span className="landing-ring-label-v2 collapse"><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
-          </motion.div>
+          />
+          <span className="landing-ring-label-v2 collapse"><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
           <div className="landing-home-v2"><Home size={20} /><span>HOME</span></div>
         </div>
 

@@ -17,7 +17,7 @@ export const chapters: Chapter[] = [
     interpretation: 'This chapter is the reference pattern used for later comparisons; it is not a claim about what an ideal routine should look like.'
   },
   {
-    id: 'collapse', number: '02', name: 'Collapse', range: 'Mar — May 2020', status: 'The radius contracts',
+    id: 'collapse', number: '02', name: 'First Lockdown', range: 'Mar — May 2020', status: 'The radius contracts',
     observation: 'During the first lockdown period, home time rises while travel, places visited, and detected movement on foot fall sharply.',
     interpretation: 'The records show a strong contraction associated with this period. They do not establish that lockdown caused any psychological outcome.'
   },
@@ -34,5 +34,5 @@ export const chapters: Chapter[] = [
 ]
 
 export const chapterColors: Record<ChapterId, string> = {
-  before: '#72E6D1', collapse: '#FF705D', adaptation: '#A58BFF', reopening: '#72E6D1'
+  before: '#8A6940', collapse: '#9B5961', adaptation: '#745D76', reopening: '#66765F'
 }

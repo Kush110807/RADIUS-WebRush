@@ -24,7 +24,7 @@ export default function StoryView({
   reduceMotion: boolean
   onNavigate: (view: AppView) => void
 }) {
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(() => Math.max(0, chapterAnchors(data.records).collapse))
   const [thread, setThread] = useState<ThreadId>('movement')
   const [evidenceOpen, setEvidenceOpen] = useState(false)
   const [announcement, setAnnouncement] = useState('')
