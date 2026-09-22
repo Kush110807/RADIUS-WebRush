@@ -55,9 +55,11 @@ function LivingRadius({
   const baselineRadius = 174
   const currentRadius = currentScore == null || baselineScore <= 0
     ? 72
-    : clamp(60, 192, baselineRadius * (currentScore / baselineScore))
+    : clamp(60, 200, baselineRadius * (currentScore / baselineScore))
   const isReference = receipt.chapter === 'before'
-  const currentColor = chapterColors[receipt.chapter]
+  const chapterColor = chapterColors[receipt.chapter]
+  const currentColor = isReference ? '#6E3948' : chapterColor
+  const currentLabel = isReference ? 'Selected day' : receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter
   const threadMeta = threads.find((item) => item.id === thread)!
 
   const deltaVsBaseline = currentScore == null || baselineScore === 0
@@ -77,13 +79,13 @@ function LivingRadius({
     ? 'No comparable radius score'
     : Math.abs(deltaVsBaseline) < 2
       ? 'Near the Before reference'
-      : `${Math.abs(Math.round(deltaVsBaseline))}% ${deltaVsBaseline < 0 ? 'smaller' : 'larger'} than Before`
+      : `${Math.abs(Math.round(deltaVsBaseline))}% ${deltaVsBaseline < 0 ? 'smaller' : 'larger'} than ${isReference ? 'Before median' : 'Before'}`
 
   return (
     <motion.figure layoutId="living-radius" className="radius-v2" aria-labelledby="radius-v2-title radius-v2-caption">
       <div className="radius-statebar-v2" aria-hidden="true">
-        <span className="reference"><i /> <b>Before</b><strong>{Math.round(baselineScore)}<small>/100</small></strong></span>
-        {!isReference && <span className="current" style={{ '--current': currentColor } as CSSProperties}><i /> <b>{receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter}</b><strong>{currentScore == null ? '—' : Math.round(currentScore)}<small>/100</small></strong></span>}
+        <span className="reference"><i /> <b>{isReference ? 'Before median' : 'Before'}</b><strong>{Math.round(baselineScore)}<small>/100</small></strong></span>
+        <span className="current" style={{ '--current': currentColor } as CSSProperties}><i /> <b>{currentLabel}</b><strong>{currentScore == null ? '—' : Math.round(currentScore)}<small>/100</small></strong></span>
       </div>
 
       <div className="radius-canvas-v2">
@@ -92,7 +94,7 @@ function LivingRadius({
           <desc id="radius-v2-desc">
             The Before reference score is {Math.round(baselineScore)} out of 100.
             {isReference
-              ? ' This selected day is in the Before reference chapter, so only the reference ring is shown.'
+              ? ` The selected Before-day score is ${currentScore ?? 'unavailable'} out of 100 and is compared with the Before chapter median.`
               : ` The selected day score is ${currentScore ?? 'unavailable'} out of 100. The current ring is scaled relative to the Before reference.`}
             This is a visual storytelling score, not physical distance.
           </desc>
@@ -107,28 +109,7 @@ function LivingRadius({
           <text x="250" y="482" textAnchor="middle" className="radius-v2-compass">S</text>
           <text x="30" y="255" textAnchor="middle" className="radius-v2-compass">W</text>
 
-          <circle
-            cx="250"
-            cy="250"
-            r={baselineRadius}
-            className={`radius-v2-baseline ${isReference ? 'is-reference' : ''}`}
-          />
-
-          {!isReference && (
-            <motion.circle
-              cx="250"
-              cy="250"
-              fill="transparent"
-              stroke={currentColor}
-              strokeWidth="3"
-              initial={quiet ? false : { r: baselineRadius, opacity: 0.25 }}
-              animate={{ r: currentRadius, opacity: currentScore == null ? 0.35 : 1 }}
-              transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 20 }}
-              className="radius-v2-current"
-            />
-          )}
-
-          {!isReference && currentScore != null && (
+          {currentScore != null && (
             <motion.circle
               cx="250"
               cy="250"
@@ -138,6 +119,27 @@ function LivingRadius({
               transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 20 }}
             />
           )}
+
+          {currentScore != null && (
+            <motion.circle
+              cx="250"
+              cy="250"
+              fill="transparent"
+              stroke={currentColor}
+              strokeWidth="4"
+              initial={quiet ? false : { r: baselineRadius, opacity: 0.25 }}
+              animate={{ r: currentRadius, opacity: currentScore == null ? 0.35 : 1 }}
+              transition={quiet ? { duration: 0 } : { type: 'spring', stiffness: 90, damping: 20 }}
+              className="radius-v2-current"
+            />
+          )}
+
+          <circle
+            cx="250"
+            cy="250"
+            r={baselineRadius}
+            className="radius-v2-baseline"
+          />
 
           <circle cx="250" cy="250" r="42" className="radius-v2-home" />
           <foreignObject x="218" y="214" width="64" height="74" className="radius-v2-home-object">
@@ -150,25 +152,15 @@ function LivingRadius({
       </div>
 
       <figcaption id="radius-v2-caption" className="radius-summary-v2">
-        {isReference ? (
-          <div className="radius-reference-summary-v2">
-            <p>Reference chapter</p>
-            <strong>{Math.round(baselineScore)}<small>/100</small></strong>
-            <span>This ring is the Before benchmark used throughout the story.</span>
-          </div>
-        ) : (
-          <>
-            <div className="radius-score-compare-v2">
-              <span><small>Before</small><b>{Math.round(baselineScore)}</b><em>/100</em></span>
-              <i aria-hidden="true">→</i>
-              <span className="current" style={{ '--current': currentColor } as CSSProperties}><small>{receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter}</small><b>{currentScore == null ? '—' : Math.round(currentScore)}</b><em>/100</em></span>
-            </div>
-            <div className="radius-takeaway-v2">
-              <strong>{deltaCopy}</strong>
-              <span>Living-radius score · visual storytelling measure, not physical distance.</span>
-            </div>
-          </>
-        )}
+        <div className="radius-score-compare-v2">
+          <span><small>{isReference ? 'Before median' : 'Before'}</small><b>{Math.round(baselineScore)}</b><em>/100</em></span>
+          <i aria-hidden="true">→</i>
+          <span className="current" style={{ '--current': currentColor } as CSSProperties}><small>{currentLabel}</small><b>{currentScore == null ? '—' : Math.round(currentScore)}</b><em>/100</em></span>
+        </div>
+        <div className="radius-takeaway-v2">
+          <strong>{deltaCopy}</strong>
+          <span>{isReference ? 'Selected Before-day vs the chapter median.' : 'Living-radius score · visual storytelling measure, not physical distance.'}</span>
+        </div>
       </figcaption>
 
       <section className="fingerprint-v2" aria-label={`${threadMeta.label} evidence differences`}>

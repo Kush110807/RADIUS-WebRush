@@ -34,5 +34,5 @@ export const chapters: Chapter[] = [
 ]
 
 export const chapterColors: Record<ChapterId, string> = {
-  before: '#8A6940', collapse: '#9B5961', adaptation: '#745D76', reopening: '#66765F'
+  before: '#7D5E37', collapse: '#8B5961', adaptation: '#6B5470', reopening: '#5A6C54'
 }

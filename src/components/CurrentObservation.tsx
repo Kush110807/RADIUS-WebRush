@@ -12,7 +12,7 @@ function chapterComparison(receipt: LifeReceipt, data: DataPayload) {
   const here = data.chapterMedians[receipt.chapter]
 
   if (receipt.chapter === 'before') {
-    return 'This chapter is the reference pattern used to compare the later periods.'
+    return 'This chapter supplies the benchmark for the later story, but individual days still vary around that median. The radius therefore compares the selected Before-day with the chapter median instead of hiding that within-chapter variation.'
   }
 
   const distancePct = base.distanceKm && here.distanceKm != null
@@ -25,9 +25,19 @@ function chapterComparison(receipt: LifeReceipt, data: DataPayload) {
     return `Median travel is ${distancePct == null ? 'lower' : `${Math.abs(distancePct)}% lower`} than Before${homeDiff == null ? '' : `, home time is ${Math.abs(homeDiff).toFixed(1)} hours higher`}${placesDiff == null ? '' : `, and places visited fall by ${Math.abs(placesDiff).toFixed(0)}`}.`
   }
   if (receipt.chapter === 'adaptation') {
-    return 'The routine remains narrower than Before while a different day-to-day pattern stabilises.'
+    const pieces = [
+      distancePct == null ? 'travel remains below the Before median' : `median travel is ${Math.abs(distancePct)}% ${distancePct < 0 ? 'lower' : 'higher'} than Before`,
+      placesDiff == null ? null : `places visited are ${Math.abs(placesDiff).toFixed(0)} ${placesDiff < 0 ? 'fewer' : 'more'}`,
+      homeDiff == null ? null : `home time is ${Math.abs(homeDiff).toFixed(1)} hours ${homeDiff > 0 ? 'higher' : 'lower'}`,
+    ].filter(Boolean)
+    return `The routine stabilises in a smaller recorded world: ${pieces.join(', ')}.`
   }
-  return 'The recorded world expands again, although not every signal returns to its earlier pattern.'
+  const pieces = [
+    distancePct == null ? 'travel returns close to the earlier pattern' : `median travel is ${Math.abs(distancePct)}% ${distancePct < 0 ? 'below' : 'above'} Before`,
+    placesDiff == null ? null : `places visited are ${Math.abs(placesDiff).toFixed(0)} ${placesDiff < 0 ? 'fewer' : 'more'}`,
+    homeDiff == null ? null : `home time is ${Math.abs(homeDiff).toFixed(1)} hours ${homeDiff > 0 ? 'higher' : 'lower'}`,
+  ].filter(Boolean)
+  return `The recorded world expands again: ${pieces.join(', ')}. Not every signal returns to its earlier median.`
 }
 
 function formatMetric(value: number, unit: string, digits = 0) {
@@ -65,6 +75,41 @@ export default function CurrentObservation({
       qualification: spec.qualification,
     }]
   }).slice(0, 5), [baseline, receipt, thread])
+
+  const observationSnapshot = useMemo(() => {
+    const pct = (value: number | null, reference: number | null) => {
+      if (value == null || reference == null || reference === 0) return 'No baseline'
+      const delta = ((value - reference) / Math.abs(reference)) * 100
+      if (Math.abs(delta) < 3) return 'Near median'
+      return `${delta > 0 ? '+' : '−'}${Math.abs(Math.round(delta))}% vs median`
+    }
+    const absolute = (value: number | null, reference: number | null, unit: string, digits = 1) => {
+      if (value == null || reference == null) return 'No baseline'
+      const delta = value - reference
+      if (Math.abs(delta) < (digits === 0 ? .5 : .15)) return 'Near median'
+      return `${delta > 0 ? '+' : '−'}${Math.abs(delta).toFixed(digits)}${unit} vs median`
+    }
+
+    const cards = [
+      receipt.radiusScore == null ? null : {
+        key: 'radius', label: 'Living radius', value: `${Math.round(receipt.radiusScore)}/100`,
+        delta: pct(receipt.radiusScore, baseline.radiusScore ?? data.normalisation.baselineRadiusScore),
+      },
+      receipt.distanceKm == null ? null : {
+        key: 'distance', label: 'Distance', value: `${receipt.distanceKm.toFixed(2)} km`,
+        delta: pct(receipt.distanceKm, baseline.distanceKm),
+      },
+      receipt.placesVisited == null ? null : {
+        key: 'places', label: 'Places', value: `${receipt.placesVisited}`,
+        delta: absolute(receipt.placesVisited, baseline.placesVisited, ' places', 0),
+      },
+      receipt.homeHours == null ? null : {
+        key: 'home', label: 'Home time', value: `${receipt.homeHours.toFixed(1)} h`,
+        delta: absolute(receipt.homeHours, baseline.homeHours, ' h', 1),
+      },
+    ]
+    return cards.filter((card): card is NonNullable<typeof card> => card != null)
+  }, [baseline, data.normalisation.baselineRadiusScore, receipt])
 
   const tabs = [
     { id: 'observation' as const, label: 'Observation' },
@@ -104,7 +149,22 @@ export default function CurrentObservation({
             <h2>{chapter.status}</h2>
             <p>{chapter.observation}</p>
           </motion.div>
-          <section className="observation-section-v2">
+          <section className="observation-section-v2 observation-snapshot-v3">
+            <div className="observation-snapshot-head-v3">
+              <p className="section-kicker-v2">Selected day at a glance</p>
+              <small>Compared with the Before median</small>
+            </div>
+            <div className="observation-stat-grid-v3">
+              {observationSnapshot.map((item) => (
+                <div className="observation-stat-v3" key={item.key}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                  <small>{item.delta}</small>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section className="observation-section-v2 observation-story-v3">
             <p className="section-kicker-v2">What this adds to the story</p>
             <p>{chapterComparison(receipt, data)}</p>
           </section>

@@ -22,9 +22,9 @@ export default function Methodology({ data, onBack }: { data: DataPayload; onBac
           </section>
 
           <section>
-            <h2>The thread fingerprint</h2>
+            <h2>The evidence-difference panel</h2>
             <p>
-              The thin spokes inside the radius are a comparison aid, not another score. For the selected evidence thread, each available daily metric is compared with its median in the Before chapter. The small crossbar marks that Before reference; the current dot moves inward or outward relative to it. Missing values are omitted rather than drawn at zero.
+              The expandable comparison panel beneath the radius is a reading aid, not another score. For the selected evidence lens, each available daily metric is compared with its median in the Before chapter and shown with a labelled percentage difference. Direction is explicit — above, below, or near the Before median — and missing values are omitted rather than treated as zero.
             </p>
           </section>
 

@@ -2,10 +2,10 @@ import type { LifeReceipt, ThreadId } from '../types/receipts'
 import { Footprints, MessageCircle, Moon, Smartphone, HeartPulse } from 'lucide-react'
 
 export const threads = [
-  { id: 'movement' as ThreadId, label: 'Movement', icon: Footprints, color: '#66765F', shortDescription: 'Places · travel · range', description: 'Distance, places, movement and home time' },
-  { id: 'connection' as ThreadId, label: 'Connection', icon: MessageCircle, color: '#5F7384', shortDescription: 'Calls · messages · people', description: 'Calls, SMS and social reports' },
-  { id: 'rest' as ThreadId, label: 'Rest', icon: Moon, color: '#745D76', shortDescription: 'Sleep · downtime', description: 'Model-estimated sleep' },
-  { id: 'attention' as ThreadId, label: 'Attention', icon: Smartphone, color: '#8A6940', shortDescription: 'Unlocks · apps · focus', description: 'Unlocks and background-app observations' },
+  { id: 'movement' as ThreadId, label: 'Movement', icon: Footprints, color: '#5A6C54', shortDescription: 'Places · travel · range', description: 'Distance, places, movement and home time' },
+  { id: 'connection' as ThreadId, label: 'Connection', icon: MessageCircle, color: '#556B7B', shortDescription: 'Calls · messages · people', description: 'Calls, SMS and social reports' },
+  { id: 'rest' as ThreadId, label: 'Rest', icon: Moon, color: '#6B5470', shortDescription: 'Sleep · downtime', description: 'Model-estimated sleep' },
+  { id: 'attention' as ThreadId, label: 'Attention', icon: Smartphone, color: '#7D5E37', shortDescription: 'Unlocks · apps · focus', description: 'Unlocks and background-app observations' },
   { id: 'emotion' as ThreadId, label: 'Emotion', icon: HeartPulse, color: '#8B5961', shortDescription: 'Stress · affect · mood', description: 'Self-reported stress and affect' },
 ]
 

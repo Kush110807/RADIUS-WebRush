@@ -62,7 +62,7 @@ export default function LandingView({
             animate={{ scale: 1, opacity: 1 }}
             transition={reduceMotion ? { duration: 0 } : { duration: 1, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
           />
-          <span className="landing-ring-label-v2 collapse"><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
+          <span className="landing-ring-label-v2 first-lockdown" style={{ top: `${50 - collapseRatio * 36}%` }}><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
           <div className="landing-home-v2"><Home size={20} /><span>HOME</span></div>
         </div>
 
@@ -71,7 +71,7 @@ export default function LandingView({
           <div className="landing-compare-v2">
             <span><small>Before</small><b>{Math.round(beforeRadius)}</b><em>/100</em></span>
             <i aria-hidden="true">→</i>
-            <span className="collapse"><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
+            <span className="first-lockdown"><small>First lockdown</small><b>{Math.round(collapseRadius)}</b><em>/100</em></span>
           </div>
           <div className="landing-reduction-v2"><strong>{reduction}%</strong><span><b>smaller than Before</b><small>median living-radius score</small></span></div>
         </div>

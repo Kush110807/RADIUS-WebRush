@@ -12,7 +12,7 @@ The deployed application is **frontend-only**. It uses a compact, privacy-preser
 
 ## Core interaction
 
-The centre of Story Mode is a responsive SVG **living radius**. Dragging the timeline changes the radius, place nodes, historical trail, narrative observation, and evidence receipts together.
+The centre of Story Mode is a responsive SVG **living radius**. Dragging the timeline changes the current comparison ring, narrative observation, evidence differences, and receipt context together. The fixed dashed ring is the Before benchmark; the selected-day ring shows change relative to it.
 
 The score is a visual storytelling device built from four daily mobility signals:
 
@@ -51,9 +51,9 @@ These are descriptive observations. RADIUS does not claim that lockdown medicall
 
 ## Features
 
-- Cinematic editorial landing screen with a breathing preview radius
+- Warm editorial landing screen with a clear Before → First Lockdown radius comparison
 - Guided **Story Mode** with four keyboard-accessible chapters
-- Custom responsive SVG living-radius visual with a pre-lockdown reference ring
+- Custom responsive SVG living-radius visual with a fixed Before reference ring and selected-day comparison ring
 - Accessible timeline scrubber with mouse, touch, arrow-key, Home/End support from the native range control, a March 2020 disruption marker, and record-density marks
 - Five evidence threads: **Movement, Connection, Rest, Attention, Emotion**
 - Current-day narrative, chapter comparison, and supporting receipt stack
