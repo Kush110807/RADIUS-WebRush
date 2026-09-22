@@ -1079,3 +1079,80 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   line-height:1.32;
 }
 .observation-story-v3 > p:last-child { color:#5e494b; }
+
+/* =========================================================
+   LANDING ALIGNMENT PATCH — final metric/callout discipline
+   Scope: landing hero only. No story/data/interaction changes.
+   ========================================================= */
+@media (min-width: 769px) {
+  .landing-ring-label-v2.first-lockdown {
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-areas:
+      "label label"
+      "value unit";
+    justify-items:start;
+    align-items:end;
+    column-gap:5px;
+    row-gap:2px;
+    min-width:0;
+    padding:6px 11px 7px;
+    border-radius:18px;
+    transform:translate(-50%,-116%);
+  }
+  .landing-ring-label-v2.first-lockdown small { grid-area:label; }
+  .landing-ring-label-v2.first-lockdown b {
+    grid-area:value;
+    font-size:clamp(2.35rem,3.3vw,3.35rem);
+    line-height:.86;
+  }
+  .landing-ring-label-v2.first-lockdown em {
+    grid-area:unit;
+    align-self:end;
+    padding-bottom:3px;
+  }
+
+  .landing-insight-v2 {
+    grid-template-columns:minmax(190px,.9fr) minmax(360px,1.1fr);
+    align-items:center;
+    column-gap:28px;
+    padding:20px 26px;
+  }
+  .landing-insight-v2 > p {
+    align-self:center;
+    padding-right:8px;
+  }
+  .landing-compare-v2 {
+    grid-template-columns:max-content 34px max-content;
+    justify-content:end;
+    align-items:end;
+    column-gap:15px;
+  }
+  .landing-compare-v2 > span {
+    width:max-content;
+    display:grid;
+    grid-template-columns:auto auto;
+    grid-template-areas:
+      "label label"
+      "value unit";
+    justify-content:start;
+    align-items:end;
+    column-gap:5px;
+    row-gap:3px;
+  }
+  .landing-compare-v2 > span small { grid-area:label; }
+  .landing-compare-v2 > span b { grid-area:value; }
+  .landing-compare-v2 > span em {
+    grid-area:unit;
+    align-self:end;
+    padding-bottom:4px;
+  }
+  .landing-compare-v2 > span:first-child { justify-self:start; }
+  .landing-compare-v2 > span:last-child { justify-self:end; }
+  .landing-compare-v2 > i {
+    align-self:end;
+    margin-bottom:7px;
+    line-height:1;
+  }
+  .landing-reduction-v2 { margin-top:1px; }
+}
