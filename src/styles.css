@@ -1289,3 +1289,83 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .landing-compare-v2 > span:last-child { justify-self:end; }
   .landing-reduction-v2 { grid-area:reduction; }
 }
+
+/* Final landing radius containment patch — size the circular field to its card, not the viewport. */
+.hero-visual-v2 {
+  overflow: visible;
+}
+.landing-radius-v2 {
+  width: min(100%, 610px);
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+
+/* Story timeline placement — keep the primary scrubber beside the chapter rail. */
+.story-nav-stack {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  align-self:start;
+}
+.story-nav-stack .chapters { width:100%; }
+.story-nav-stack .scrubber {
+  width:100%;
+  margin:0;
+  padding:12px 12px 11px;
+  border:1px solid rgba(75,48,52,.13);
+  border-radius:14px;
+  background:rgba(255,250,246,.68);
+  box-shadow:0 10px 28px rgba(89,54,55,.045);
+}
+.story-nav-stack .scrubber::before {
+  content:"Timeline";
+  display:block;
+  margin-bottom:8px;
+  color:#806d69;
+  font:700 .64rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.story-nav-stack .scrubber-top {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2px;
+  margin-bottom:8px;
+  font-size:.66rem;
+  line-height:1.35;
+}
+.story-nav-stack .scrubber-top span:last-child {
+  color:#9a8783;
+  font-size:.61rem;
+}
+.story-nav-stack .range-wrap { height:34px; }
+.story-nav-stack .range-track { left:1px; right:1px; }
+.story-nav-stack .disruption b {
+  top:11px;
+  font-size:.6rem!important;
+  letter-spacing:.035em;
+}
+.story-nav-stack .year-labels {
+  height:16px;
+  margin-top:1px;
+  font-size:.62rem;
+}
+.story-nav-stack .year-labels span { display:none; }
+.story-nav-stack .year-labels span:first-child,
+.story-nav-stack .year-labels span:last-child { display:block; }
+.story-nav-stack .year-labels span:last-child {
+  left:100%!important;
+  transform:translateX(-100%);
+}
+.story-nav-stack .scrub-bubble {
+  background:#5a3b40;
+  color:#fffaf6;
+  border-color:rgba(90,59,64,.5);
+  box-shadow:0 8px 22px rgba(75,48,52,.16);
+}
+.story-nav-stack .scrub-bubble b { color:#fffaf6; }
+.story-nav-stack .scrub-bubble em { color:#eadfd8; }
+
+/* Once the timeline lives in the story rail, the footer becomes a quiet secondary strip. */
+.story-v2 .story-footer { margin-top:8px; }

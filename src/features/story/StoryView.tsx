@@ -70,7 +70,10 @@ export default function StoryView({
   return (
     <motion.main id="main-content" className={`story story-v2 chapter-${current.chapter}`} key="story" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="story-grid story-grid-v2">
-        <ChapterNavigator active={current.chapter} onSelect={selectChapter} />
+        <aside className="story-nav-stack" aria-label="Story navigation and timeline">
+          <ChapterNavigator active={current.chapter} onSelect={selectChapter} />
+          <TimeScrubber records={data.records} index={index} onChange={handleScrub} />
+        </aside>
         <motion.section layoutId={reduceMotion ? undefined : 'radius-frame'} className="visual-stage visual-stage-v2" aria-labelledby="story-date">
           <div className="visual-heading visual-heading-v2">
             <div>
@@ -94,7 +97,6 @@ export default function StoryView({
         </motion.section>
         <CurrentObservation receipt={current} thread={thread} data={data} onEvidence={() => setEvidenceOpen(true)} />
       </div>
-      <TimeScrubber records={data.records} index={index} onChange={handleScrub} />
       <nav className="story-footer" aria-label="Secondary navigation">
         <button type="button" onClick={() => onNavigate('archive')}><BookOpen size={16} aria-hidden="true" />Explore all receipts</button>
         <span>{data.range.start} → {data.range.end}</span>
