@@ -58,7 +58,7 @@ function LivingRadius({
     : clamp(60, 200, baselineRadius * (currentScore / baselineScore))
   const isReference = receipt.chapter === 'before'
   const chapterColor = chapterColors[receipt.chapter]
-  const currentColor = isReference ? '#6E3948' : chapterColor
+  const currentColor = isReference ? 'var(--accent-burgundy)' : chapterColor
   const currentLabel = isReference ? 'Selected day' : receipt.chapter === 'collapse' ? 'First lockdown' : receipt.chapter
   const threadMeta = threads.find((item) => item.id === thread)!
 

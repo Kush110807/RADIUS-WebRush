@@ -779,13 +779,13 @@ svg, img { max-width:100%; }
     display:block;
     font-size:.78rem;
     line-height:1.3;
-    color:#756563;
+    color:var(--color-text-tertiary);
   }
   .story-v2 .chapter-copy strong { font-size:.82rem; }
   .story-v2 .scrubber-top { font-size:.79rem; }
   .story-v2 .scrubber-top span:last-child { font-size:.75rem; }
-  .story-v2 .year-labels { font-size:.73rem; color:#756563; }
-  .scrubber-help { font-size:.76rem; color:#756563; }
+  .story-v2 .year-labels { font-size:.73rem; color:var(--color-text-tertiary); }
+  .scrubber-help { font-size:.76rem; color:var(--color-text-tertiary); }
 }
 
 @media (max-width: 560px) {
