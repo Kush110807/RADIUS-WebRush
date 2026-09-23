@@ -1917,3 +1917,93 @@ button:disabled {
   .methodology-wrap li { font-size:.97rem; line-height:1.68; }
 }
 
+
+/* =========================================================
+   FINAL TARGETED ALIGNMENT — score definition + evidence delta
+   Scope intentionally limited to the two pre-deployment polish areas.
+   ========================================================= */
+.visual-heading-v2 { flex-wrap:wrap; }
+.score-definition-v2 {
+  flex:0 0 390px;
+  width:min(100%,390px);
+  max-width:390px;
+  box-sizing:border-box;
+  margin-inline-start:auto;
+  align-items:center;
+  justify-content:center;
+  padding:9px 14px;
+  text-align:center;
+  white-space:normal !important;
+}
+.score-definition-v2 b,
+.score-definition-v2 small {
+  display:block;
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:normal;
+}
+.score-definition-v2 b {
+  font-size:.78rem;
+  line-height:1.25;
+}
+.score-definition-v2 small {
+  font-family:"Manrope Variable", Manrope, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size:.72rem;
+  letter-spacing:.01em;
+  line-height:1.4;
+}
+
+.fingerprint-panel-v2 {
+  padding:14px 16px 15px;
+  gap:10px;
+}
+.fingerprint-row-v2 {
+  grid-template-columns:minmax(112px,.8fr) minmax(150px,1fr) minmax(205px,auto);
+  gap:16px;
+  min-height:30px;
+}
+.fingerprint-metric-v2 {
+  min-width:0;
+  overflow:visible !important;
+  text-overflow:clip !important;
+}
+.fingerprint-track-v2 {
+  height:6px;
+  align-self:center;
+  background:color-mix(in srgb,var(--color-text-primary) 8%,transparent);
+}
+.fingerprint-track-v2 i { opacity:.82; }
+.fingerprint-result-v2 {
+  display:inline-flex;
+  align-items:baseline;
+  justify-content:flex-end;
+  gap:7px;
+  min-width:0;
+  font-variant-numeric:tabular-nums;
+  line-height:1.3;
+  text-align:right;
+}
+.fingerprint-result-v2 > i {
+  flex:0 0 auto;
+  width:1em;
+  color:currentColor;
+  font-style:normal;
+  font-weight:750;
+}
+.fingerprint-result-v2 > span { min-width:0; }
+
+/* Large deltas are not forced into a misleading 0–100% bar.
+   Exact values become the primary, aligned comparison column instead. */
+.fingerprint-panel-v2.no-bars .fingerprint-row-v2 {
+  grid-template-columns:minmax(150px,1fr) minmax(245px,auto);
+  column-gap:24px;
+}
+.fingerprint-panel-v2.no-bars .fingerprint-result-v2 {
+  grid-column:2;
+}
+.fingerprint-panel-v2 > small {
+  margin-top:3px;
+  color:var(--color-text-secondary);
+  font-size:.71rem;
+  line-height:1.5;
+}
