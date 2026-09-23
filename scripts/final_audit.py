@@ -1,6 +1,7 @@
 from __future__ import annotations
 import json
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,8 +51,30 @@ require((ROOT / 'netlify.toml').is_file(), 'missing static-host deployment confi
 require((ROOT / '.github/workflows/deploy-pages.yml').is_file(), 'missing GitHub Pages workflow')
 
 # Repository cleanliness
-for unwanted in ['node_modules','dist','.vite','.env']:
-    require(not (ROOT / unwanted).exists(), f'unwanted generated/secret path included: {unwanted}')
+# CI legitimately creates node_modules after `npm install`, and local builds may create
+# dist/.vite. What matters is that generated or secret paths are not tracked in source.
+def tracked_paths() -> set[str]:
+    try:
+        result = subprocess.run(
+            ['git', 'ls-files'],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return set()
+    return {line.strip() for line in result.stdout.splitlines() if line.strip()}
+
+tracked = tracked_paths()
+if tracked:
+    for unwanted in ['node_modules', 'dist', '.vite', '.env']:
+        included = any(path == unwanted or path.startswith(f'{unwanted}/') for path in tracked)
+        require(not included, f'unwanted generated/secret path tracked in repository: {unwanted}')
+else:
+    # ZIP/export fallback: secrets must never be present. Generated folders are allowed
+    # to exist in a working directory because install/build steps create them.
+    require(not (ROOT / '.env').exists(), 'unwanted secret path included: .env')
 
 if errors:
     print('RADIUS final audit: FAIL')
