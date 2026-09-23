@@ -50,8 +50,13 @@ require((ROOT / 'netlify.toml').is_file(), 'missing static-host deployment confi
 require((ROOT / '.github/workflows/deploy-pages.yml').is_file(), 'missing GitHub Pages workflow')
 
 # Repository cleanliness
-for unwanted in ['node_modules','dist','.vite','.env']:
-    require(not (ROOT / unwanted).exists(), f'unwanted generated/secret path included: {unwanted}')
+gitignore = (ROOT / '.gitignore').read_text(encoding='utf-8').splitlines()
+ignored_patterns = {line.strip() for line in gitignore if line.strip() and not line.lstrip().startswith('#')}
+for generated in ['node_modules/', 'dist/', '.vite/']:
+    require(generated in ignored_patterns, f'generated path is not excluded by .gitignore: {generated}')
+for env_file in ROOT.glob('.env*'):
+    if env_file.name != '.env.example':
+        require(False, f'possible secret environment file present: {env_file.name}')
 
 if errors:
     print('RADIUS final audit: FAIL')
