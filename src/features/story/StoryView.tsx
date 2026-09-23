@@ -81,7 +81,7 @@ export default function StoryView({
               <h1 id="story-date">{chapter.name}</h1>
               <p>{fmtDate(current.date)} · Drag through time to see the recorded world expand and contract.</p>
             </div>
-            <span className="score-definition-v2"><b>Living-radius score · 0–100</b><small>Visual storytelling measure—not physical distance</small></span>
+            <span className="score-definition-v2"><b>Living-radius score (0–100)</b><small>Visual storytelling measure · not physical distance</small></span>
           </div>
           <LivingRadius
             receipt={current}

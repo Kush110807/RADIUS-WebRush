@@ -18,13 +18,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # Audit the checked-out source before dependency installation creates node_modules.
-      - run: npm run final:audit
       - run: npm install
       - run: npm run validate:data
       - run: npm run verify:data
       - run: npm run preflight
       - run: npm run lint
+      - run: npm run final:audit
       - run: npm run test:formatters
       - run: npm run typecheck
       - run: npm run build -- --base=/${{ github.event.repository.name }}/

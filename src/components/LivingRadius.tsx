@@ -73,10 +73,6 @@ function LivingRadius({
     return [{ key: String(spec.key), label: compactMetricLabel(spec.label), delta }]
   }).slice(0, 5), [baselineMedians, receipt, thread])
 
-  // A 0–100% bar is only truthful when every visible comparison fits that scale.
-  // Larger differences are presented as aligned exact values rather than visually clamped bars.
-  const fingerprintUsesBars = fingerprint.length > 0 && fingerprint.every((item) => Math.abs(item.delta) <= 100)
-
   return (
     <motion.figure layoutId="living-radius" className="radius-v2" aria-labelledby="radius-v2-title radius-v2-caption">
       <div className="radius-statebar-v2" aria-hidden="true">
@@ -155,35 +151,29 @@ function LivingRadius({
         </div>
       </figcaption>
 
-      <section className="fingerprint-v2" aria-label={`${threadMeta.label} evidence differences`}>
+      <section
+        className="fingerprint-v2"
+        aria-label={`${threadMeta.label} evidence differences`}
+        style={{ '--thread': threadMeta.color } as CSSProperties}
+      >
         <button type="button" className="fingerprint-toggle-v2" onClick={onToggleFingerprint} aria-expanded={showFingerprint}>
           <span><i style={{ background: threadMeta.color }} />{threadMeta.label} differences vs Before</span>
           {showFingerprint ? <ChevronUp size={17} aria-hidden="true" /> : <ChevronDown size={17} aria-hidden="true" />}
         </button>
         {showFingerprint && (
-          <div className={`fingerprint-panel-v2${fingerprintUsesBars ? '' : ' no-bars'}`}>
+          <div className="fingerprint-panel-v2">
             {fingerprint.length ? fingerprint.map((item) => {
-              const abs = Math.abs(item.delta)
-              const near = abs < 0.5
-              const direction = near ? '≈' : item.delta > 0 ? '↑' : '↓'
+              const abs = Math.min(100, Math.abs(item.delta))
+              const near = Math.abs(item.delta) < 0.5
               return (
                 <div className="fingerprint-row-v2" key={item.key}>
-                  <span className="fingerprint-metric-v2">{item.label}</span>
-                  {fingerprintUsesBars && (
-                    <div className="fingerprint-track-v2" aria-hidden="true">
-                      <i style={{ width: `${abs}%`, background: threadMeta.color }} />
-                    </div>
-                  )}
-                  <b className={`fingerprint-result-v2 ${near ? 'near' : item.delta > 0 ? 'up' : 'down'}`}>
-                    <i aria-hidden="true">{direction}</i>
-                    <span>{comparisonFromPct(item.delta, 'Before')}</span>
-                  </b>
+                  <span>{item.label}</span>
+                  <div className="fingerprint-track-v2" aria-hidden="true"><i style={{ width: `${Math.max(4, abs)}%`, background: threadMeta.color }} /></div>
+                  <b className={near ? 'near' : item.delta > 0 ? 'up' : 'down'}>{comparisonFromPct(item.delta, 'Before')}</b>
                 </div>
               )
             }) : <p>No comparable {threadMeta.label.toLowerCase()} signals are recorded for this day.</p>}
-            <small>{fingerprintUsesBars
-              ? 'Bars use a 0–100% change scale; arrows and text show direction versus the Before median.'
-              : 'Exact percentage differences are shown versus the Before median; arrows and text show direction.'}</small>
+            <small>Bars show the magnitude of change. Arrows show whether the recorded value is above or below the Before median.</small>
           </div>
         )}
       </section>
