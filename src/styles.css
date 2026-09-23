@@ -695,7 +695,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .fingerprint-toggle-v2 > span { display:flex; align-items:center; gap:8px; font-size:.76rem; }
 .fingerprint-toggle-v2 i { width:7px; height:7px; border-radius:50%; }
 .fingerprint-panel-v2 { border-top:1px solid var(--line); padding:10px 14px 12px; display:grid; gap:8px; }
-.fingerprint-row-v2 { display:grid; grid-template-columns:minmax(105px,1.1fr) minmax(80px,1fr) 78px; align-items:center; gap:10px; }
+.fingerprint-row-v2 { display:grid; grid-template-columns:minmax(0,1fr) minmax(70px,1.05fr) max-content; align-items:center; gap:10px; }
 .fingerprint-row-v2 > span { color:var(--color-text-body); font-size:.73rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .fingerprint-track-v2 { height:4px; border-radius:999px; background:rgba(75,48,52,.07); overflow:hidden; }
 .fingerprint-track-v2 i { display:block; height:100%; border-radius:inherit; opacity:.8; }
@@ -1916,4 +1916,3 @@ button:disabled {
   .methodology-wrap section > p,
   .methodology-wrap li { font-size:.97rem; line-height:1.68; }
 }
-

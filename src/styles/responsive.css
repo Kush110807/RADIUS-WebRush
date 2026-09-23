@@ -832,6 +832,7 @@ svg, img { max-width:100%; }
 }
 /* Final readability pass: lift small supporting copy without changing the type palette. */
 .story-v2 .chapter-copy small { font-size:.8rem; line-height:1.35; }
+.fingerprint-row-v2 { grid-template-columns:minmax(0,1fr) minmax(70px,1.05fr) max-content; gap:10px; }
 .fingerprint-row-v2 > span { font-size:.77rem; }
 .fingerprint-row-v2 > b { font-size:.73rem; }
 .fingerprint-panel-v2 > small { font-size:.72rem; line-height:1.5; }
@@ -847,6 +848,17 @@ svg, img { max-width:100%; }
 
 @media (max-width: 560px) {
   .story-v2 .chapter-copy small { font-size:.78rem; }
+  .fingerprint-row-v2 {
+    grid-template-columns:minmax(0,1fr) max-content;
+    grid-template-areas:
+      "label value"
+      "track track";
+    column-gap:8px;
+    row-gap:6px;
+  }
+  .fingerprint-row-v2 > span { grid-area:label; min-width:0; }
+  .fingerprint-row-v2 > .fingerprint-track-v2 { grid-area:track; width:100%; }
+  .fingerprint-row-v2 > b { grid-area:value; text-align:right; }
   .fingerprint-row-v2 > span { font-size:.74rem; }
   .fingerprint-row-v2 > b { font-size:.7rem; }
   .archive-card-head { font-size:.81rem; }
